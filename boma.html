@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Foglie cadenti</title>
+  <style>
+    :root{
+      --bg1:#0f1c2e;
+      --bg2:#09121f;
+      --ink:#eef6ff;
+      --stroke:rgba(255,255,255,.12);
+    }
+    html,body{height:100%;margin:0}
+    body{background:radial-gradient(120% 120% at 50% 0%, var(--bg1) 0%, var(--bg2) 100%);color:var(--ink);font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;overflow:hidden}
+
+    .wrap{position:relative;min-height:100vh}
+    header{position:absolute;top:0;left:0;right:0;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+    .title{font-weight:900;letter-spacing:.02em}
+    .panel{display:flex;gap:8px;background:rgba(255,255,255,.06);border:1px solid var(--stroke);padding:8px;border-radius:12px;backdrop-filter:blur(8px)}
+    .panel label{font-size:12px;opacity:.9}
+    .panel input[type=range]{width:120px}
+
+    .scene{position:absolute;inset:0;overflow:hidden}
+
+    /* Foglia base */
+    .leaf{position:absolute;top:-10vh;will-change:transform, opacity}
+    .leaf svg{display:block;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))}
+
+    /* Animazioni */
+    @keyframes fall{
+      0%{transform:translate3d(var(--x,0), -10vh, 0) rotate(var(--r,0))}
+      100%{transform:translate3d(calc(var(--x,0) + var(--drift, 0px)), 110vh, 0) rotate(calc(var(--r,0) + var(--spin, 180deg)))}
+    }
+
+    .cta{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(0,0,0,.35);border:1px solid var(--stroke);padding:10px 12px;border-radius:12px;backdrop-filter:blur(6px);font-size:14px}
+    .cta a{color:#8ad6ff;font-weight:800;text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">Animazione foglie cadenti</div>
+      <div class="panel">
+        <label>Numero: <input id="count" type="range" min="10" max="120" value="40"></label>
+        <label>Velocità: <input id="speed" type="range" min="6" max="24" value="12"></label>
+        <label>Varietà: <input id="variety" type="range" min="1" max="4" value="3"></label>
+      </div>
+    </header>
+
+    <div class="scene" id="scene"></div>
+
+    <div class="cta">Tocca lo schermo per aggiungere più foglie ✨</div>
+  </div>
+
+  <script>
+    const scene = document.getElementById('scene')
+    const countInput = document.getElementById('count')
+    const speedInput = document.getElementById('speed')
+    const varietyInput = document.getElementById('variety')
+
+    const PALETTES = [
+      ['#ffb703','#fb8500','#e76f51'],
+      ['#c2f5ff','#8ad6ff','#bfe8ff'],
+      ['#ffd6a5','#ffadad','#ffd166'],
+      ['#caffbf','#9bf6ff','#bdb2ff']
+    ]
+
+    const SHAPES = [
+      'M50 0 C40 18 30 24 18 30 C30 34 36 38 32 50 C44 46 50 44 50 44 C50 44 56 46 68 50 C64 38 70 34 82 30 C70 24 60 18 50 0 Z',
+      'M50 4 C18 6 6 34 10 56 C14 74 30 90 50 96 C70 90 86 74 90 56 C94 34 82 6 50 4 Z',
+      'M50 6 C36 14 28 24 26 36 C18 40 14 50 18 60 C12 68 18 80 28 84 C34 96 44 100 50 100 C56 100 66 96 72 84 C82 80 88 68 82 60 C86 50 82 40 74 36 C72 24 64 14 50 6 Z',
+      'M50 8 C30 10 16 20 12 34 C22 46 36 52 50 52 C64 52 78 46 88 34 C84 20 70 10 50 8 Z'
+    ]
+
+    function createLeaf(){
+      const leaf = document.createElement('div')
+      leaf.className = 'leaf'
+      const palette = PALETTES[Math.floor(Math.random()*PALETTES.length)]
+      const c1 = palette[Math.floor(Math.random()*palette.length)]
+      const c2 = palette[Math.floor(Math.random()*palette.length)]
+      const shape = SHAPES[Math.floor(Math.random()*Math.min(SHAPES.length, parseInt(varietyInput.value,10)))]
+
+      const size = Math.random()*22 + 16
+      const startX = Math.random()*100
+      const drift = (Math.random()*120 - 60) + 'px'
+      const spin = (Math.random()>0.5? 180 : -180) + 'deg'
+      const rot = Math.random()*180 + 'deg'
+      const dur = (30 - parseInt(speedInput.value,10)) + Math.random()*6
+
+      leaf.style.setProperty('--x', startX+'vw')
+      leaf.style.setProperty('--drift', drift)
+      leaf.style.setProperty('--spin', spin)
+      leaf.style.setProperty('--r', rot)
+      leaf.style.animation = `fall ${dur}s linear forwards`
+
+      const gid = 'g'+Math.random().toString(36).slice(2)
+      leaf.innerHTML = `
+        <svg width="${size}" height="${size*1.2}" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="${c1}" />
+              <stop offset="100%" stop-color="${c2}" />
+            </linearGradient>
+          </defs>
+          <path d="${shape}" fill="url(#${gid})" stroke="rgba(255,255,255,.25)" stroke-width="0.8" />
+          <path d="M50 0 L50 110" stroke="rgba(0,0,0,.18)" stroke-width="2" opacity=".4"/>
+        </svg>`
+
+      leaf.addEventListener('animationend', ()=> leaf.remove())
+      return leaf
+    }
+
+    let running = true
+    function populate(){
+      if(!running) return
+      const target = parseInt(countInput.value,10)
+      const current = scene.querySelectorAll('.leaf').length
+      if(current < target){
+        scene.appendChild(createLeaf())
+      }
+      requestAnimationFrame(populate)
+    }
+
+    function resetLeaves(){
+      scene.querySelectorAll('.leaf').forEach(l=>l.remove())
+    }
+    varietyInput.addEventListener('input', resetLeaves)
+
+    scene.addEventListener('pointerdown', ()=>{
+      for(let i=0;i<6;i++) scene.appendChild(createLeaf())
+    })
+
+    document.addEventListener('visibilitychange',()=>{running = !document.hidden; if(running) populate()})
+
+    populate()
+  </script>
+</body>
+</html>
