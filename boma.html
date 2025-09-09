@@ -3,166 +3,522 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
-  <title>BOMA teaser</title>
+  <title>boma teaser + signup (modal)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      --bg1:#0f1c2e;
-      --bg2:#09121f;
-      --ink:#eef6ff;
-      --stroke:rgba(255,255,255,.14);
-      --wave1:rgba(255,255,255,.28);
-      --wave2:rgba(255,255,255,.22);
-      --wave3:rgba(255,255,255,.18);
+      --bg1:#0f1c2e; --bg2:#09121f; --ink:#eef6ff; --stroke:rgba(255,255,255,.14);
+      --wave1:rgba(255,255,255,.28); --wave2:rgba(255,255,255,.22); --wave3:rgba(255,255,255,.18);
+      --card:#14141c; --text:#f3f5f7; --muted:#a9b1bc; --accent:#7c5cff; --ok:#3ddc97; --err:#ff6b6b;
     }
+    *{box-sizing:border-box}
     html,body{height:100%;margin:0}
     body{
       min-height:100vh;
       background:radial-gradient(140% 140% at 50% 0%, var(--bg1) 0%, var(--bg2) 100%);
       color:var(--ink);
       font-family:Inter,system-ui,Arial;
-      overflow:hidden;
+      overflow-x:hidden;
     }
+    body.noscroll{overflow:hidden}
 
-    header{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;justify-content:center;padding:12px}
-    .title{font-weight:900;font-size:18px;text-align:center}
-
-    .countdown-wrap{
-      position:absolute;top:38%;left:50%;transform:translateX(-50%);
-      font-size:32px;font-weight:900;
+    /* TIMER */
+    header{position:fixed;left:0;right:0;top:0;z-index:6;display:flex;justify-content:center;pointer-events:none}
+    .hud{
+      margin:12px;
       background:rgba(0,0,0,.28);
       border:1px solid var(--stroke);
-      padding:6px 16px;border-radius:12px;
-      backdrop-filter:blur(8px);z-index:5;
+      padding:10px 14px;border-radius:14px;
+      backdrop-filter:blur(8px);
+      font-weight:900;font-size:10.5vw;line-height:1;
       font-variant-numeric:tabular-nums;letter-spacing:.02em;
+      text-shadow:0 10px 26px rgba(0,0,0,.35)
     }
-    .countdown-wrap.urgent{border-color:rgba(255,99,99,.6);color:#ff6b6b;animation:pulse 1.2s ease-in-out infinite}
-    @keyframes pulse{0%{text-shadow:0 0 0 rgba(255,107,107,0)}50%{text-shadow:0 0 18px rgba(255,107,107,.65)}100%{text-shadow:0 0 0 rgba(255,107,107,0)}}
+    @media(min-width:520px){ .hud{font-size:6.2vw} }
+    .hud.urgent{border-color:rgba(255,99,99,.6);color:#ffdfdf}
 
+    /* HEADLINE */
     .line{
-      position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);
-      font-weight:900;font-size:4.2vw;
-      text-align:center;line-height:1.2;max-width:90%;
+      position:fixed;left:50%;top:56%;transform:translate(-50%,-50%);
+      font-weight:900;font-size:5vw;text-align:center;line-height:1.25;max-width:92vw;
       text-shadow:0 8px 24px rgba(0,0,0,.35);transition:opacity .5s;z-index:4
     }
+    @media(min-width:520px){ .line{font-size:3.6vw} }
     .line.fade{opacity:.15}
 
-    .scene{position:absolute;inset:0;overflow:hidden;z-index:3}
-
-    .cta{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:5}
-    .cta button{border:none;background:#8ad6ff;color:#041327;font-weight:900;padding:12px 18px;border-radius:12px;font-size:15px}
-
-    #wlModal{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;z-index:50}
-    #wlModal .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55)}
-    #wlModal .box{width:100%;max-width:460px;background:rgba(8,17,30,.96);border-top-left-radius:16px;border-top-right-radius:16px;border:1px solid var(--stroke);padding:16px;backdrop-filter:blur(8px)}
-    #wlModal input[type=email]{width:100%;padding:12px;border-radius:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.05);color:var(--ink);font-size:15px;margin-bottom:8px}
-    #wlModal label{font-size:12px;display:flex;gap:6px;align-items:flex-start;margin-bottom:8px}
-    #wlModal button[type=submit]{width:100%;padding:12px;border-radius:12px;border:none;font-weight:900;font-size:15px;background:linear-gradient(90deg,#bfe8ff,#8ad6ff);color:#041327}
-
+    /* PARTICELLE / STAGE */
+    .scene{position:fixed;inset:0;overflow:hidden;z-index:3;pointer-events:none}
     .leaf{position:absolute;top:-10vh;will-change:transform,opacity;animation:fallY 12s linear forwards}
     .leaf .rot{display:inline-block;animation:spin 10s linear forwards}
-    .flake{position:absolute;top:-10vh;will-change:transform,opacity;animation:fallY 14s linear forwards}
     .flakeTxt{position:absolute;top:-10vh;will-change:transform,opacity;font-size:18px;animation:fallY 14s linear forwards}
+    .bomaTxt{position:absolute;top:-10vh;will-change:transform,opacity;animation:fallY 12s linear forwards;font-weight:900;letter-spacing:.06em}
 
     @keyframes fallY{0%{transform:translate(var(--x,0vw),-10vh)}100%{transform:translate(calc(var(--x,0vw) + var(--drift,0px)),110vh)}}
     @keyframes spin{0%{transform:rotate(var(--r,0deg))}100%{transform:rotate(var(--rEnd,210deg))}}
 
-    .waves{position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen;filter:blur(.3px) hue-rotate(0deg);animation:hueCycle 40s linear infinite}
-    @keyframes hueCycle{0%{filter:blur(.3px) hue-rotate(0deg)}100%{filter:blur(.3px) hue-rotate(360deg)}}
-
+    /* ONDE */
+    .waves{position:fixed;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen;filter:blur(.3px)}
     .waves svg{position:absolute;left:0;width:260%;height:40vh}
     .waves .l1{bottom:64vh}
     .waves .l2{bottom:32vh}
     .waves .l3{bottom:0}
     .waves .move{animation-timing-function:linear;animation-iteration-count:infinite;will-change:transform}
-    .waves .l1 .move{animation:slide1 22s linear infinite}
-    .waves .l2 .move{animation:slide2 28s linear infinite}
-    .waves .l3 .move{animation:slide3 36s linear infinite}
+    .waves .l1 .move{animation-name:slide1;animation-duration:22s}
+    .waves .l2 .move{animation-name:slide2;animation-duration:28s}
+    .waves .l3 .move{animation-name:slide3;animation-duration:36s}
     @keyframes slide1{from{transform:translateX(0)}to{transform:translateX(-1200px)}}
     @keyframes slide2{from{transform:translateX(0)}to{transform:translateX(-1200px)}}
     @keyframes slide3{from{transform:translateX(0)}to{transform:translateX(-1200px)}}
+    @media (prefers-reduced-motion: reduce){
+      .waves .move{animation-duration:0s}
+      .leaf,.flakeTxt,.bomaTxt{animation-duration:0s}
+    }
+
+    /* CTA FISSA CENTRATA */
+    .floating-cta{
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      z-index:99; pointer-events:auto;
+      display:inline-flex; align-items:center; justify-content:center;
+      appearance:none; border:0; padding:14px 20px; border-radius:18px;
+      font-weight:800; letter-spacing:.02em;
+      background:linear-gradient(90deg,#4ade80,#22c55e); color:#0b0b10;
+      box-shadow:0 10px 24px rgba(0,0,0,.35), 0 0 0 3px rgba(34,197,94,.18);
+    }
+    .floating-cta[aria-expanded="true"]{
+      /* colore invariato su richiesta; cambiamo solo l’anello per feedback */
+      box-shadow:0 10px 24px rgba(0,0,0,.35), 0 0 0 3px rgba(255,255,255,.2);
+    }
+
+    /* MODALE FULL-SCREEN */
+    .modal{
+      position:fixed; inset:0; display:none; z-index:120;
+      align-items:center; justify-content:center;
+    }
+    .modal.show{display:flex}
+    .modal .backdrop{
+      position:absolute; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(4px);
+    }
+    .modal .sheet{
+      position:relative; z-index:2; width:100%; max-width:860px; padding:16px;
+    }
+    .card{
+      background:var(--card); color:var(--text);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 10px 30px rgba(0,0,0,.5);
+      border-radius:18px; padding:18px 18px 22px;
+    }
+    .closeX{
+      position:absolute; right:24px; top:18px; z-index:3;
+      appearance:none; border:0; background:transparent; color:var(--muted);
+      font-size:26px; line-height:1; width:36px; height:36px; border-radius:10px; cursor:pointer
+    }
+    .closeX:hover{background:rgba(255,255,255,.06); color:var(--text)}
+
+    label{display:block; font-weight:600; margin:14px 0 6px}
+    input, select, textarea{width:100%; padding:12px 14px; background:#0f0f16; color:var(--text); border:1px solid rgba(255,255,255,.08); border-radius:12px; outline:none}
+    input:focus, select:focus, textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,92,255,.2)}
+    .row{display:grid; grid-template-columns:1fr; gap:14px}
+    @media(min-width:720px){ .row{grid-template-columns:1fr 1fr} }
+    .hint{font-size:13px; color:var(--muted); margin-top:6px}
+    .btn{appearance:none; border:0; padding:14px 18px; border-radius:14px; font-weight:700; color:#0b0b10; background:var(--ok); cursor:pointer}
+    .btn:disabled{opacity:.6; cursor:not-allowed}
+    .note{font-size:12px; color:var(--muted); margin-top:16px}
+    .toast{position:fixed; right:18px; bottom:88px; background:#11111a; color:var(--text); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px 14px; max-width:320px; transform:translateY(30px); opacity:0; transition:.25s; z-index:200}
+    .toast.show{transform:translateY(0); opacity:1}
   </style>
 </head>
 <body>
-  <header><div class="title">BOMA teaser</div></header>
+  <!-- TIMER -->
+  <header>
+    <div class="hud" aria-live="polite"><span class="cd" id="countdown">00:00:00</span></div>
+  </header>
 
-  <div id="countdown" class="countdown-wrap">00:00:00</div>
-  <div id="line" class="line">Sei pronto? Novità in arrivo per la nuova stagione</div>
+  <!-- HEADLINE -->
+  <div id="line" class="line">Sei pronto?
+Novità in arrivo per la nuova stagione.</div>
 
-  <!-- Onde -->
+  <!-- ONDE -->
   <div class="waves" aria-hidden="true">
-    <svg class="l1" viewBox="0 0 1200 200"><defs><path id="w1" d="M0,120 C150,80 300,160 450,120 C600,80 750,160 900,120 C1050,80 1150,140 1200,120 L1200,200 L0,200 Z"/></defs><g class="move" fill="var(--wave1)"><use href="#w1" x="0"/><use href="#w1" x="1200"/><use href="#w1" x="2400"/></g></svg>
-    <svg class="l2" viewBox="0 0 1200 200"><defs><path id="w2" d="M0,130 C140,100 320,150 480,130 C640,110 780,170 920,140 C1060,110 1160,150 1200,140 L1200,200 L0,200 Z"/></defs><g class="move" fill="var(--wave2)"><use href="#w2" x="0"/><use href="#w2" x="1200"/><use href="#w2" x="2400"/></g></svg>
-    <svg class="l3" viewBox="0 0 1200 200"><defs><path id="w3" d="M0,140 C160,130 300,170 460,150 C620,130 760,180 920,160 C1080,140 1160,170 1200,165 L1200,200 L0,200 Z"/></defs><g class="move" fill="var(--wave3)"><use href="#w3" x="0"/><use href="#w3" x="1200"/><use href="#w3" x="2400"/></g></svg>
+    <svg class="l1" viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <defs><path id="w1" d="M0,120 C150,80 300,160 450,120 C600,80 750,160 900,120 C1050,80 1150,140 1200,120 L1200,200 L0,200 Z"/></defs>
+      <g class="move" fill="var(--wave1)"><use href="#w1" x="0"/><use href="#w1" x="1200"/><use href="#w1" x="2400"/></g>
+    </svg>
+    <svg class="l2" viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <defs><path id="w2" d="M0,130 C140,100 320,150 480,130 C640,110 780,170 920,140 C1060,110 1160,150 1200,140 L1200,200 L0,200 Z"/></defs>
+      <g class="move" fill="var(--wave2)"><use href="#w2" x="0"/><use href="#w2" x="1200"/><use href="#w2" x="2400"/></g>
+    </svg>
+    <svg class="l3" viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <defs><path id="w3" d="M0,140 C160,130 300,170 460,150 C620,130 760,180 920,160 C1080,140 1160,170 1200,165 L1200,200 L0,200 Z"/></defs>
+      <g class="move" fill="var(--wave3)"><use href="#w3" x="0"/><use href="#w3" x="1200"/><use href="#w3" x="2400"/></g>
+    </svg>
   </div>
 
+  <!-- PARTICELLE -->
   <div class="scene" id="scene" aria-hidden="true"></div>
-  <div class="cta"><button id="ctaOpen">Entra in lista</button></div>
 
-  <!-- Modal -->
-  <div id="wlModal">
-    <div class="backdrop" id="wlBackdrop"></div>
-    <div class="box">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <strong>Lista d’attesa</strong>
-        <button id="wlClose" style="background:none;border:none;color:var(--ink)">✕</button>
-      </div>
-      <form id="waitlist">
-        <input id="email" name="email" type="email" placeholder="La tua email" required>
-        <label><input id="consent" type="checkbox" required> Acconsento a ricevere aggiornamenti sul Boma</label>
-        <button type="submit">Iscrivimi</button>
-        <div style="font-size:11px;opacity:.7;margin-top:6px">Titolare: Nome Locale S.r.l. Uso: gestione lista e invio info. Puoi revocare in ogni momento.</div>
+  <!-- CTA FISSA -->
+  <button id="openFormBtn" class="floating-cta" type="button" aria-expanded="false" aria-controls="signupModal">Entra in lista</button>
+
+  <!-- MODALE -->
+  <div id="signupModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
+    <div class="backdrop" id="modalBackdrop"></div>
+    <div class="sheet">
+      <button type="button" class="closeX" id="closeForm" aria-label="Chiudi">×</button>
+      <form id="signup" class="card" novalidate>
+        <h2 id="signupTitle" style="margin:0 0 8px;font-weight:800;font-size:18px">Iscriviti alla newsletter</h2>
+
+        <div class="row">
+          <div>
+            <label for="name">Nome</label>
+            <input id="name" name="name" type="text" autocomplete="name" required />
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="phone">Telefono opzionale</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" />
+            <div class="hint">Utile per follow up su WhatsApp.</div>
+          </div>
+          <div>
+            <label for="topic">Interesse principale</label>
+            <select id="topic" name="topic" required>
+              <option value="Novità">Novità e lanci</option>
+              <option value="Promo">Promozioni e inviti</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="notes">Cosa ti interessa di più</label>
+          <textarea id="notes" name="notes" rows="4" placeholder="Scrivi qualche riga.
+Useremo queste info per creare l’email su misura"></textarea>
+        </div>
+
+        <div class="checkline" style="display:flex; align-items:flex-start; gap:10px; margin-top:12px">
+          <input id="privacy" type="checkbox" required style="width:auto; accent-color:var(--accent)" />
+          <label for="privacy" style="margin:0; font-weight:500">Acconsento al trattamento dei dati secondo la <a href="#" target="_blank" rel="noopener">Privacy Policy</a>.</label>
+        </div>
+
+        <div style="margin-top:12px">
+          <button class="btn" id="submitBtn" type="submit">Iscrivimi</button>
+        </div>
+
+        <p class="note">I dati vengono inviati a un webhook sicuro.</p>
       </form>
+
+      <div id="preview" style="display:none; margin-top:16px;">
+        <div class="card" style="text-align:center">
+          <p class="hint" style="margin-top:0">Anteprima tessera generata</p>
+          <img id="cardPreview" alt="Anteprima tessera" style="max-width:100%; height:auto; border-radius:12px" />
+        </div>
+      </div>
     </div>
   </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const scene=document.getElementById('scene')
-  const lineEl=document.getElementById('line')
-  const cdEl=document.getElementById('countdown')
-  const root=document.documentElement
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  const THEMES=[
-    {bg:['#1a2537','#0c1524'],palette:['#ffb703','#fb8500','#e76f51','#ffd166'],shapes:'leaves',text:'Sei pronto? Novità in arrivo per la nuova stagione'},
-    {bg:['#0b1930','#0a1022'],palette:['#c2f5ff','#8ad6ff','#bfe8ff','#eaf6ff'],shapes:'flakes',text:'Respiro d’inverno. Sorprese all’orizzonte'},
-    {bg:['#261c1a','#0f1216'],palette:['#d97706','#f59e0b','#b45309','#92400e'],shapes:'leavesHeavy',text:'Profumo di bosco. Pronto al cambio'},
-    {bg:['#0a1724','#0a0f19'],palette:['#bbf0ff','#a5e3ff','#daefff','#9bd1ff'],shapes:'crystals',text:'Gelo creativo. Il Boma si avvicina'},
-    {bg:['#1a2431','#0c121b'],palette:['#ffbe76','#ffa502','#ff7f50','#ff6b6b'],shapes:'leavesLite',text:'Ultimi colori. Nuova stagione in arrivo'},
-    {bg:['#0b1a2c','#091223'],palette:['#eaf6ff','#dff2ff','#cfe9ff','#bfe0ff'],shapes:'flakesSoft',text:'Nevica piano. Preparati al lancio'},
-    {bg:['#20151a','#0f1016'],palette:['#f94144','#f3722c','#f8961e','#f9844a'],shapes:'berries',text:'Dettagli che scaldano. Siamo quasi pronti'},
-    {bg:['#0a1c28','#08111b'],palette:['#bde0fe','#a2d2ff','#caf0f8','#ade8f4'],shapes:'needles',text:'Aria frizzante. Nuovo capitolo in vista'},
-    {bg:['#291a14','#111016'],palette:['#ffadad','#ffd6a5','#fdc086','#f4a261'],shapes:'leavesRound',text:'Ritmo che cambia. Tieniti pronto'},
-    {bg:['#0b1324','#070e19'],palette:['#b8e1ff','#9bd1ff','#c9f1ff','#ffffff'],shapes:'stars',text:'Cielo terso. Magia in arrivo'},
-    {bg:['#201c13','#0f1013'],palette:['#c9a227','#dda15e','#bc6c25','#e76f51'],shapes:'acorns',text:'Calore e attesa. Il momento si avvicina'},
-    {bg:['#0a1526','#07101b'],palette:['#94d2ff','#7ac8ff','#b3e5ff','#e0f2ff'],shapes:'shards',text:'Scintille di ghiaccio. Ci vediamo presto'}
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+
+<script>
+/* ====== TEASER (onde, particelle, boma, countdown) ====== */
+document.addEventListener('DOMContentLoaded', () => {
+  const scene = document.getElementById('scene')
+  const lineEl = document.getElementById('line')
+  const cdEl = document.getElementById('countdown')
+  const hud = document.querySelector('.hud')
+  const root = document.documentElement
+
+  const THEMES = [
+    {mode:'autumn',bg:['#1a2537','#0c1524'],palette:['#ffb703','#fb8500','#e76f51','#ffd166'],shapes:'leaves',text:'Sei pronto?  Novità in arrivo per la nuova stagione.'},
+    {mode:'winter',bg:['#0b1930','#0a1022'],palette:['#c2f5ff','#8ad6ff','#bfe8ff','#eaf6ff'],shapes:'flakes',text:'Respiro d’inverno.  Sorprese all’orizzonte.'},
+    {mode:'autumn',bg:['#261c1a','#0f1216'],palette:['#d97706','#f59e0b','#b45309','#92400e'],shapes:'leavesHeavy',text:'Profumo di bosco.  Pronto al cambio.'},
+    {mode:'winter',bg:['#0a1724','#0a0f19'],palette:['#bbf0ff','#a5e3ff','#daefff','#9bd1ff'],shapes:'crystals',text:'Gelo creativo.  Il Boma si avvicina.'},
+    {mode:'autumn',bg:['#1a2431','#0c121b'],palette:['#ffbe76','#ffa502','#ff7f50','#ff6b6b'],shapes:'leavesLite',text:'Ultimi colori.  Nuova stagione in arrivo.'},
+    {mode:'winter',bg:['#0b1a2c','#091223'],palette:['#eaf6ff','#dff2ff','#cfe9ff','#bfe0ff'],shapes:'flakesSoft',text:'Nevica piano.  Preparati al lancio.'},
+    {mode:'autumn',bg:['#20151a','#0f1016'],palette:['#f94144','#f3722c','#f8961e','#f9844a'],shapes:'berries',text:'Dettagli che scaldano.  Siamo quasi pronti.'},
+    {mode:'winter',bg:['#0a1c28','#08111b'],palette:['#bde0fe','#a2d2ff','#caf0f8','#ade8f4'],shapes:'needles',text:'Aria frizzante.  Nuovo capitolo in vista.'},
+    {mode:'autumn',bg:['#291a14','#111016'],palette:['#ffadad','#ffd6a5','#fdc086','#f4a261'],shapes:'leavesRound',text:'Ritmo che cambia.  Tieniti pronto.'},
+    {mode:'winter',bg:['#0b1324','#070e19'],palette:['#b8e1ff','#9bd1ff','#c9f1ff','#ffffff'],shapes:'stars',text:'Cielo terso.  Magia in arrivo.'},
+    {mode:'autumn',bg:['#201c13','#0f1013'],palette:['#c9a227','#dda15e','#bc6c25','#e76f51'],shapes:'acorns',text:'Calore e attesa.  Il momento si avvicina.'},
+    {mode:'winter',bg:['#0a1526','#07101b'],palette:['#94d2ff','#7ac8ff','#b3e5ff','#e0f2ff'],shapes:'shards',text:'Scintille di ghiaccio.  Ci vediamo presto.'}
   ]
 
-  const LEAF_SHAPES=[
+  const LEAF_SHAPES = [
     'M50 0 C40 18 30 24 18 30 C30 34 36 38 32 50 C44 46 50 44 50 44 C56 46 68 50 64 38 70 34 82 30 70 24 60 18 50 0 Z',
     'M50 4 C18 6 6 34 10 56 C14 74 30 90 50 96 C70 90 86 74 90 56 C94 34 82 6 50 4 Z',
     'M50 6 C36 14 28 24 26 36 C18 40 14 50 18 60 C12 68 18 80 28 84 C34 96 44 100 50 100 C56 100 66 96 72 84 C82 80 88 68 82 60 C86 50 82 40 74 36 C72 24 64 14 50 6 Z',
     'M50 8 C30 10 16 20 12 34 C22 46 36 52 50 52 C64 52 78 46 88 34 C84 20 70 10 50 8 Z'
   ]
 
-  let currentSlot=-1,targetLeaves=40
-  const pick=arr=>arr[Math.floor(Math.random()*arr.length)]
-  const setBackground=(c1,c2)=>{root.style.setProperty('--bg1',c1);root.style.setProperty('--bg2',c2)}
-  const setWaves=palette=>{const col=(h,a)=>`rgba(${parseInt(h.substr(1,2),16)},${parseInt(h.substr(3,2),16)},${parseInt(h.substr(5,2),16)},${a})`;root.style.setProperty('--wave1',col(palette[0]||'#fff',.34));root.style.setProperty('--wave2',col(palette[1]||'#fff',.26));root.style.setProperty('--wave3',col(palette[2]||'#fff',.22))}
+  let currentSlot = -1
+  let targetLeaves = 40
+  let lastBomaAt = 0
 
-  function createLeaf(palette,shapes){const leaf=document.createElement('div');leaf.className='leaf';const c1=pick(palette),c2=pick(palette),shape=pick(shapes);const size=Math.random()*22+18,startX=Math.random()*100,driftPx=Math.floor(Math.random()*140-70),dur=6+Math.random()*8;baseDeg=Math.floor(Math.random()*180);spinDeg=Math.random()>0.5?210:-210;leaf.style.setProperty('--x',startX+'vw');leaf.style.setProperty('--drift',driftPx+'px');leaf.style.setProperty('--r',baseDeg+'deg');leaf.style.setProperty('--rEnd',(baseDeg+spinDeg)+'deg');leaf.style.animationDuration=`${dur}s`;const gid='g'+Math.random().toString(36).slice(2);const rot=document.createElement('div');rot.className='rot';rot.style.animationDuration=`${dur*0.9}s`;rot.innerHTML=`<svg width="${size}" height="${size}" viewBox="0 0 100 100"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs><path d="${shape}" fill="url(#${gid})"/></svg>`;leaf.appendChild(rot);leaf.addEventListener('animationend',()=>leaf.remove());return leaf}
+  const pick = arr => arr[Math.floor(Math.random()*arr.length)]
+  const setBackground = (c1,c2) => { root.style.setProperty('--bg1',c1); root.style.setProperty('--bg2',c2) }
+  const setWaves = palette => {
+    const col = (hex, a) => {
+      const h = hex.replace('#','')
+      const r = parseInt(h.substr(0,2),16)
+      const g = parseInt(h.substr(2,2),16)
+      const b = parseInt(h.substr(4,2),16)
+      return `rgba(${r},${g},${b},${a})`
+    }
+    const p0 = palette[0] || '#ffffff'
+    const p1 = palette[1] || p0
+    const p2 = palette[2] || p1
+    root.style.setProperty('--wave1', col(p0, .34))
+    root.style.setProperty('--wave2', col(p1, .26))
+    root.style.setProperty('--wave3', col(p2, .22))
+  }
 
-  function createTextParticle(chars,min=12,max=22,cls='flakeTxt'){const el=document.createElement('div');el.className=cls;el.textContent=pick(chars);const startX=Math.random()*100,driftPx=Math.floor(Math.random()*100-50),dur=7+Math.random()*9;el.style.setProperty('--x',startX+'vw');el.style.setProperty('--drift',driftPx+'px');el.style.animationDuration=dur+'s';el.style.fontSize=Math.floor(Math.random()*(max-min)+min)+'px';el.addEventListener('animationend',()=>el.remove());return el}
+  function createLeaf(palette, shapes){
+    const leaf = document.createElement('div'); leaf.className = 'leaf'
+    const c1 = pick(palette), c2 = pick(palette)
+    const shape = pick(shapes)
+    const size = Math.random()*22 + 18
+    const startX = Math.random()*100
+    const driftPx = Math.floor(Math.random()*140 - 70)
+    const dur = 6 + Math.random()*8
+    const baseDeg = Math.floor(Math.random()*180)
+    const spinDeg = Math.random()>0.5 ? 210 : -210
+    leaf.style.setProperty('--x', startX+'vw')
+    leaf.style.setProperty('--drift', driftPx+'px')
+    leaf.style.setProperty('--r', baseDeg+'deg')
+    leaf.style.setProperty('--rEnd', (baseDeg+spinDeg)+'deg')
+    leaf.style.animationDuration = `${dur}s`
+    const gid = 'g'+Math.random().toString(36).slice(2)
+    const rot = document.createElement('div')
+    rot.className = 'rot'; rot.style.animationDuration = `${dur*0.9}s`
+    rot.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}" /><stop offset="100%" stop-color="${c2}" /></linearGradient></defs><path d="${shape}" fill="url(#${gid})" /></svg>`
+    leaf.appendChild(rot)
+    leaf.addEventListener('animationend', ()=> leaf.remove())
+    return leaf
+  }
 
-  function updateTheme(){const now=new Date();const slot=Math.floor(now.getMinutes()/5)%12;if(slot===currentSlot)return;currentSlot=slot;const t=THEMES[slot];setBackground(t.bg[0],t.bg[1]);setWaves(t.palette);lineEl.classList.add('fade');setTimeout(()=>{lineEl.textContent=t.text;lineEl.classList.remove('fade')},260);targetLeaves=36+Math.floor(Math.random()*10);scene.querySelectorAll('.leaf,.flake,.flakeTxt').forEach(n=>n.remove());document.body.dataset.shapes=t.shapes;document.body.dataset.palette=t.palette.join(',')}
+  function createTextParticle(chars, sizeMin=12, sizeMax=22){
+    const el = document.createElement('div'); el.className = 'flakeTxt'
+    el.textContent = pick(chars)
+    const startX = Math.random()*100
+    const driftPx = Math.floor(Math.random()*100 - 50)
+    const dur = 7 + Math.random()*9
+    el.style.setProperty('--x', startX+'vw')
+    el.style.setProperty('--drift', driftPx+'px')
+    el.style.animationDuration = dur+'s'
+    el.style.fontSize = Math.floor(Math.random()*(sizeMax-sizeMin)+sizeMin)+'px'
+    el.addEventListener('animationend', ()=> el.remove())
+    return el
+  }
 
-  function loop(){const shapesKey=document.body.dataset.shapes||'leaves',palette=(document.body.dataset.palette||'').split(',');const leavesNow=scene.querySelectorAll('.leaf').length,flakesNow=scene.querySelectorAll('.flake,.flakeTxt').length;if(shapesKey.startsWith('leaves')&&leavesNow<targetLeaves)scene.appendChild(createLeaf(palette,LEAF_SHAPES));if(shapesKey==='flakes'&&flakesNow<20)scene.appendChild(createTextParticle(['❄','✻','✼','✽'],16,24));if(shapesKey==='flakesSoft'&&flakesNow<26)scene.appendChild(createTextParticle(['❄','•','·','✶'],14,22));if(shapesKey==='crystals'&&flakesNow<18)scene.appendChild(createTextParticle(['❄','✶'],14,26));if(shapesKey==='stars'&&flakesNow<22)scene.appendChild(createTextParticle(['✦','✧','✩','✯'],14,20));if(shapesKey==='needles'&&flakesNow<18)scene.appendChild(createTextParticle(['|','∣','⎟'],12,18));if(shapesKey==='berries'&&flakesNow<16)scene.appendChild(createTextParticle(['●','•','◍'],10,14));if(shapesKey==='acorns'&&flakesNow<14)scene.appendChild(createTextParticle(['⬤','◐','◑'],12,18));if(shapesKey==='shards'&&flakesNow<20)scene.appendChild(createTextParticle(['▴','▵','▾','▿'],10,26));requestAnimationFrame(loop)}
+  function createBomaText(palette){
+    const el = document.createElement('div')
+    el.className = 'bomaTxt'
+    el.textContent = Math.random() < 0.5 ? 'boma' : 'BOMA'
+    const size = Math.floor(22 + Math.random()*28)
+    const col = pick(palette) || '#ffffff'
+    const h = col.replace('#','')
+    const r = parseInt(h.substr(0,2),16)
+    const g = parseInt(h.substr(2,2),16)
+    const b = parseInt(h.substr(4,2),16)
+    const weight = Math.random() < .4 ? 800 : 900
+    const letterSpace = Math.random() < .5 ? '.02em' : '.08em'
+    const rotate = (Math.random()*6 - 3).toFixed(1)
+    const startX = Math.random()*100
+    const driftPx = Math.floor(Math.random()*120 - 60)
+    const dur = 7 + Math.random()*9
+    el.style.setProperty('--x', startX+'vw')
+    el.style.setProperty('--drift', driftPx+'px')
+    el.style.animationDuration = dur+'s'
+    el.style.fontSize = size+'px'
+    el.style.color = `rgb(${r},${g},${b})`
+    el.style.textShadow = `0 4px 12px rgba(0,0,0,.45), 0 0 18px rgba(${r},${g},${b},.35)`
+    el.style.fontWeight = weight
+    el.style.letterSpacing = letterSpace
+    el.style.transform = `rotate(${rotate}deg)`
+    el.addEventListener('animationend', ()=> el.remove())
+    return el
+  }
 
-  function updateCountdown(){const now=new Date(),nextMidnight=new Date();nextMidnight.setHours(24,0,0,0);const ms=nextMidnight-now,totalSec=Math.max(0,Math.floor(ms/1000)),h=Math.floor(totalSec/3600),m=Math.floor((totalSec%3600)/60),s=totalSec%60;const pad=n=>n<10?'0'+n:n;cdEl.textContent=`${pad(h)}:${pad(m)}:${pad(s)}`;if(totalSec<=600)cdEl.classList.add('urgent');else cdEl.classList.remove('urgent')}
+  function paletteFromDataset(){ return (document.body.dataset.palette || '').split(',').filter(Boolean) }
 
-  updateTheme();for(let i=0;i<20;i++)scene.appendChild(createLeaf(['#ffb703','#fb8500','#e76f51'],LEAF_SHAPES));loop();setInterval(updateTheme,15000);updateCountdown();setInterval(updateCountdown,1000)
+  function updateTheme(){
+    const now = new Date()
+    const slot = Math.floor(now.getMinutes()/5) % 12
+    if(slot === currentSlot) return
+    currentSlot = slot
 
-  const modal=document.getElementById('wlModal');document.getElementById('ctaOpen').onclick=()=>modal.style.display='flex';document.getElementById('wlClose').onclick=()=>modal.style.display='none';document.getElementById('wlBackdrop').onclick=()=>modal.style.display='none'
+    const t = THEMES[slot]
+    setBackground(t.bg[0], t.bg[1])
+    setWaves(t.palette)
+
+    lineEl.classList.add('fade')
+    setTimeout(()=>{ lineEl.textContent = t.text; lineEl.classList.remove('fade') }, 260)
+
+    targetLeaves = 36 + Math.floor(Math.random()*10)
+    scene.querySelectorAll('.leaf,.flakeTxt,.bomaTxt').forEach(n=>n.remove())
+
+    document.body.dataset.shapes = t.shapes
+    document.body.dataset.palette = t.palette.join(',')
+  }
+
+  function loop(){
+    const shapesKey = document.body.dataset.shapes || 'leaves'
+    const palette = paletteFromDataset()
+    const leavesNow = scene.querySelectorAll('.leaf').length
+    const flakesNow = scene.querySelectorAll('.flakeTxt').length
+
+    if(shapesKey.startsWith('leaves') && leavesNow < targetLeaves) scene.appendChild(createLeaf(palette, LEAF_SHAPES))
+    if(shapesKey === 'leavesHeavy' && leavesNow < targetLeaves+8) scene.appendChild(createLeaf(palette, LEAF_SHAPES))
+    if(shapesKey === 'leavesLite'  && leavesNow < Math.max(24, targetLeaves-8)) scene.appendChild(createLeaf(palette, LEAF_SHAPES))
+
+    if(shapesKey === 'flakes'      && flakesNow < 20) scene.appendChild(createTextParticle(['❄','✻','✼','✽'], 16, 24))
+    if(shapesKey === 'flakesSoft'  && flakesNow < 26) scene.appendChild(createTextParticle(['❄','•','·','✶'], 14, 22))
+    if(shapesKey === 'crystals'    && flakesNow < 18) scene.appendChild(createTextParticle(['❄','•','·','✶'], 14, 26))
+    if(shapesKey === 'stars'       && flakesNow < 22) scene.appendChild(createTextParticle(['✦','✧','✩','✫','✯'], 14, 20))
+    if(shapesKey === 'needles'     && flakesNow < 18) scene.appendChild(createTextParticle(['|','∣','⎟'], 12, 18))
+    if(shapesKey === 'berries'     && flakesNow < 16) scene.appendChild(createTextParticle(['●','•','◍'], 10, 14))
+    if(shapesKey === 'acorns'      && flakesNow < 14) scene.appendChild(createTextParticle(['⬤','◐','◑'], 12, 18))
+    if(shapesKey === 'shards'      && flakesNow < 20) scene.appendChild(createTextParticle(['▴','▵','▾','▿','◢','◣'], 10, 26))
+
+    const now = performance.now()
+    if(now - lastBomaAt > 1800 + Math.random()*2000){
+      lastBomaAt = now
+      scene.appendChild(createBomaText(palette))
+    }
+    requestAnimationFrame(loop)
+  }
+
+  const pad = n => n<10 ? '0'+n : ''+n
+  function updateCountdown(){
+    const now = new Date()
+    const nextMidnight = new Date(now)
+    nextMidnight.setHours(24,0,0,0)
+    const ms = nextMidnight - now
+    const totalSec = Math.max(0, Math.floor(ms/1000))
+    const h = Math.floor(totalSec/3600)
+    const m = Math.floor((totalSec%3600)/60)
+    const s = totalSec%60
+    cdEl.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`
+    if(totalSec <= 600){ hud.classList.add('urgent') } else { hud.classList.remove('urgent') }
+    if(totalSec === 0){
+      updateTheme()
+      scene.querySelectorAll('.leaf,.flakeTxt,.bomaTxt').forEach(n=>n.remove())
+    }
+  }
+
+  updateTheme()
+  for(let i=0;i<26;i++) scene.appendChild(createLeaf(['#ffb703','#fb8500','#e76f51'], LEAF_SHAPES))
+  loop()
+  setInterval(updateTheme, 5000)
+  updateCountdown()
+  setInterval(updateCountdown, 1000)
 })
+</script>
+
+<script>
+/* ====== CTA FISSA + MODALE (no scroll) ====== */
+(function(){
+  const $ = s => document.querySelector(s);
+  const toast = msg => { const t = $('#toast'); if(!t) return; t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 4200); };
+
+  const btn = $('#openFormBtn');
+  const modal = $('#signupModal');
+  const closeBtn = $('#closeForm');
+  const backdrop = $('#modalBackdrop');
+  const form = $('#signup');
+
+  function setOpen(open){
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('noscroll', open);
+    modal.classList.toggle('show', open);
+    if(open){ const first = $('#name'); first && first.focus(); }
+  }
+
+  btn.addEventListener('click', ()=> setOpen(true));
+  closeBtn.addEventListener('click', ()=> setOpen(false));
+  backdrop.addEventListener('click', ()=> setOpen(false));
+  window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') setOpen(false); });
+
+  // ------- submit (webhook + tessera) -------
+  function generateMemberId(){ const base = 10000 + (Date.now() % 90000000); return String(base); }
+  function drawQRCode(ctx, text, x, y, size){
+    const qr = qrcode(0, 'M'); qr.addData(text); qr.make();
+    const n = qr.getModuleCount(); const scale = Math.max(2, Math.floor(size / n)); const sizePx = n * scale;
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(x, y, sizePx, sizePx);
+    ctx.fillStyle = '#000000';
+    for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(qr.isDark(r,c)) ctx.fillRect(x + c*scale, y + r*scale, scale, scale);
+    return { width: sizePx, height: sizePx };
+  }
+  async function buildCardImage(name, memberId){
+    const w = 640, h = 360; const c = document.createElement('canvas'); c.width = w; c.height = h; const ctx = c.getContext('2d');
+    const grad = ctx.createLinearGradient(0,0,w,h); grad.addColorStop(0, '#1f1b3a'); grad.addColorStop(1, '#342e6b');
+    ctx.fillStyle = grad; const r = 24;
+    ctx.beginPath(); ctx.moveTo(r,0); ctx.arcTo(w,0,w,h,r); ctx.arcTo(w,h,0,h,r); ctx.arcTo(0,h,0,0,r); ctx.arcTo(0,0,w,0,r); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#cfd2ff'; ctx.font='700 20px Inter, system-ui, sans-serif'; ctx.fillText('Tessera membro', 32, 40);
+    ctx.fillStyle='#ffffff'; ctx.font='700 36px Inter, system-ui, sans-serif'; ctx.fillText(name||'Membro', 32, 95);
+    ctx.fillStyle='#cfd2ff'; ctx.font='600 18px Inter, system-ui, sans-serif'; ctx.fillText('N° '+memberId, 32, 130);
+    const qr = drawQRCode(ctx, String(memberId), 32, 160, 180); ctx.fillStyle='#cfd2ff'; ctx.font='600 16px Inter, system-ui, sans-serif'; ctx.fillText(memberId, 32, 160 + qr.height + 28);
+    return c.toDataURL('image/png');
+  }
+  async function buildEmail({ name, topic, notes }){
+    const subject = `Ciao ${name}, benvenuto in lista`;
+    const intro   = `Ciao ${name}, grazie per l’iscrizione. Ho letto ciò che ti interessa e ho preparato una mini guida su misura.`;
+    const bodyByTopic = {
+      'Novità': `Ti terrò aggiornato su release e dietro le quinte. Arriveranno anteprime e inviti riservati.`,
+      'Promo':  `Riceverai offerte selezionate e inviti con priorità. Pochi messaggi, zero spam.`
+    };
+    const custom  = notes && notes.trim() ? `Ho preso nota: “${notes.trim()}”.` : `Se vuoi, rispondi a questa mail e dimmi su cosa vuoi approfondire.`;
+    const outro   = `A presto. Se non vuoi più ricevere messaggi, puoi disiscriverti in un click.`;
+    const memberId = generateMemberId(); const cardUrl = await buildCardImage(name, memberId);
+    const html = [`<p>${intro}</p>`,`<p>${bodyByTopic[topic]||''}</p>`,`<p>${custom}</p>`,`<p style="margin:24px 0 12px;font-weight:700">La tua tessera personale</p>`,`<img src="${cardUrl}" alt="Tessera ${memberId}" style="max-width:100%;height:auto;border-radius:12px"/>`,`<p>${outro}</p>`].join('\n');
+    const text = [intro, bodyByTopic[topic]||'', custom, `Tessera ${memberId}.`, outro].join(' ');
+    return { subject, body: text, html, memberId, cardUrl };
+  }
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const btnS = document.getElementById('submitBtn'); if(btnS) btnS.disabled = true;
+    if(!document.getElementById('name').value || !document.getElementById('email').value || document.getElementById('privacy').checked !== true){
+      toast('Compila i campi obbligatori e dai il consenso'); if(btnS) btnS.disabled=false; return;
+    }
+    const payload = {
+      name: document.getElementById('name').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      topic: document.getElementById('topic').value,
+      notes: document.getElementById('notes').value.trim(),
+      consent: document.getElementById('privacy').checked,
+      signup_iso: new Date().toISOString()
+    };
+    const emailDraft = await buildEmail(payload);
+    payload.email_subject = emailDraft.subject;
+    payload.email_body = emailDraft.html;
+    payload.email_body_text = emailDraft.body;
+    payload.member_id = emailDraft.memberId;
+    payload.card_image_data_url = emailDraft.cardUrl;
+
+    const WEBHOOK_URL = 'https://hook.eu2.make.com/ys73jb0nhhenm5ri524xt6qemzd1g0ce';
+    try{
+      const res = await fetch(WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      if(!res.ok) throw new Error('Errore rete');
+      toast('Iscrizione salvata. Controlla la posta.');
+      e.target.reset(); setOpen(false);
+    }catch(err){
+      console.error(err); toast('Si è verificato un problema. Riprova tra poco');
+    }finally{
+      if(btnS) btnS.disabled=false;
+    }
+  });
+})();
 </script>
 </body>
 </html>
