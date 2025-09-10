@@ -180,7 +180,7 @@ Novità in arrivo per la nuova stagione.</div>
   <div class="scene" id="scene" aria-hidden="true"></div>
 
   <!-- BOOM MESSAGE (hidden initially) -->
-  <div id="boomMsg" class="boomMessage" aria-hidden="true">THE WINTER BOMA IS COMING</div>
+  <div id="boomMsg" class="boomMessage" aria-hidden="true">THE WINTER BOMA<br>IS COMING</div>
 
   <!-- CTA FISSA -->
   <button id="openFormBtn" class="floating-cta" type="button" aria-expanded="false" aria-controls="signupModal">Entra in lista</button>
@@ -423,9 +423,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateCountdown(){
     const now = new Date()
-    const target = (() => { const t = new Date(now); t.setHours(20,38,0,0); if(t <= now) t.setDate(t.getDate()+1); return t })()
+    const target = (() => { const t = new Date(now); t.setHours(20,55,0,0); if(t <= now) t.setDate(t.getDate()+1); return t })()
     const ms = target - now
     const totalSec = Math.max(0, Math.floor(ms/1000))
+
+    // If more than 12 hours remain, hide timer and show boom message
+    const THRESHOLD = 12 * 3600 // 12 hours in seconds
+    if (totalSec > THRESHOLD) {
+      document.querySelector('header').style.display = 'none'
+      lineEl.style.display = 'none'
+      if (boomMsg) { boomMsg.classList.add('show'); boomMsg.setAttribute('aria-hidden','false') }
+      return
+    } else {
+      // Within 12 hours: show timer and hide boom message
+      document.querySelector('header').style.display = ''
+      lineEl.style.display = ''
+      if (boomMsg) { boomMsg.classList.remove('show'); boomMsg.setAttribute('aria-hidden','true') }
+    }
+
     const h = Math.floor(totalSec/3600)
     const m = Math.floor((totalSec%3600)/60)
     const s = totalSec%60
