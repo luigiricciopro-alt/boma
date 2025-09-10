@@ -41,6 +41,25 @@
     @media(min-width:520px){ .hud{font-size:6.2vw} }
     .hud.urgent{border-color:rgba(255,99,99,.6);color:#ffdfdf}
 
+    /* TIMER color + boom message */
+    .cd{ transition: color .6s linear }
+    .boomMessage{
+      position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.92);
+      z-index:999; pointer-events:none;
+      font-weight:900; font-size:10vw; line-height:1.05; text-align:center; letter-spacing:.08em;
+      color:#ffffff; text-shadow:0 10px 26px rgba(0,0,0,.45), 0 0 24px rgba(255,255,255,.28);
+      opacity:0; transition:opacity .9s ease, transform .9s cubic-bezier(.2,.9,.2,1);
+    }
+    @media(min-width:520px){ .boomMessage{ font-size:6.6vw } }
+    .boomMessage.show{
+      opacity:1; transform:translate(-50%,-50%) scale(1);
+      animation: glow 2.4s ease-in-out infinite .9s;
+    }
+    @keyframes glow{
+      0%,100%{ text-shadow:0 10px 26px rgba(0,0,0,.45), 0 0 10px rgba(255,80,80,.22) }
+      50%    { text-shadow:0 14px 30px rgba(0,0,0,.55), 0 0 22px rgba(255,80,80,.42) }
+    }
+
     /* HEADLINE */
     .line{
       position:fixed;left:50%;top:56%;transform:translate(-50%,-50%);
@@ -160,6 +179,9 @@ Novità in arrivo per la nuova stagione.</div>
   <!-- PARTICELLE -->
   <div class="scene" id="scene" aria-hidden="true"></div>
 
+  <!-- BOOM MESSAGE (hidden initially) -->
+  <div id="boomMsg" class="boomMessage" aria-hidden="true">THE WINTER BOMA IS COMING</div>
+
   <!-- CTA FISSA -->
   <button id="openFormBtn" class="floating-cta" type="button" aria-expanded="false" aria-controls="signupModal">Entra in lista</button>
 
@@ -188,20 +210,8 @@ Novità in arrivo per la nuova stagione.</div>
             <input id="phone" name="phone" type="tel" autocomplete="tel" />
             <div class="hint">Utile per follow up su WhatsApp.</div>
           </div>
-          <div>
-            <label for="topic">Interesse principale</label>
-            <select id="topic" name="topic" required>
-              <option value="Novità">Novità e lanci</option>
-              <option value="Promo">Promozioni e inviti</option>
-            </select>
-          </div>
         </div>
 
-        <div>
-          <label for="notes">Cosa ti interessa di più</label>
-          <textarea id="notes" name="notes" rows="4" placeholder="Scrivi qualche riga.
-Useremo queste info per creare l’email su misura"></textarea>
-        </div>
 
         <div class="checkline" style="display:flex; align-items:flex-start; gap:10px; margin-top:12px">
           <input id="privacy" type="checkbox" required style="width:auto; accent-color:var(--accent)" />
@@ -235,6 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const lineEl = document.getElementById('line')
   const cdEl = document.getElementById('countdown')
   const hud = document.querySelector('.hud')
+  const boomMsg = document.getElementById('boomMsg')
   const root = document.documentElement
 
   const THEMES = [
@@ -361,7 +372,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setWaves(t.palette)
 
     lineEl.classList.add('fade')
-    setTimeout(()=>{ lineEl.textContent = t.text; lineEl.classList.remove('fade') }, 260)
+    setTimeout(()=>{
+      // Insert a line break after periods so the second sentence goes to a new line
+      const formatted = (t.text || '').replace(/\. +(?=\S)/g, '.<br>')
+      lineEl.innerHTML = formatted
+      lineEl.classList.remove('fade')
+    }, 260)
 
     targetLeaves = 36 + Math.floor(Math.random()*10)
     scene.querySelectorAll('.leaf,.flakeTxt,.bomaTxt').forEach(n=>n.remove())
@@ -384,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(shapesKey === 'flakesSoft'  && flakesNow < 26) scene.appendChild(createTextParticle(['❄','•','·','✶'], 14, 22))
     if(shapesKey === 'crystals'    && flakesNow < 18) scene.appendChild(createTextParticle(['❄','•','·','✶'], 14, 26))
     if(shapesKey === 'stars'       && flakesNow < 22) scene.appendChild(createTextParticle(['✦','✧','✩','✫','✯'], 14, 20))
-    if(shapesKey === 'needles'     && flakesNow < 18) scene.appendChild(createTextParticle(['|','∣','⎟'], 12, 18))
+    if(shapesKey === 'needles'     && flakesNow < 18) scene.appendChild(createTextParticle(['❧','☙','❦','❧'], 12, 18))
     if(shapesKey === 'berries'     && flakesNow < 16) scene.appendChild(createTextParticle(['●','•','◍'], 10, 14))
     if(shapesKey === 'acorns'      && flakesNow < 14) scene.appendChild(createTextParticle(['⬤','◐','◑'], 12, 18))
     if(shapesKey === 'shards'      && flakesNow < 20) scene.appendChild(createTextParticle(['▴','▵','▾','▿','◢','◣'], 10, 26))
@@ -398,18 +414,42 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const pad = n => n<10 ? '0'+n : ''+n
+  function lerpColor(c1, c2, t){
+    const a = [parseInt(c1.substr(1,2),16), parseInt(c1.substr(3,2),16), parseInt(c1.substr(5,2),16)]
+    const b = [parseInt(c2.substr(1,2),16), parseInt(c2.substr(3,2),16), parseInt(c2.substr(5,2),16)]
+    const m = a.map((v,i)=> Math.round(v + (b[i]-v)*t))
+    return `rgb(${m[0]},${m[1]},${m[2]})`
+  }
+
   function updateCountdown(){
     const now = new Date()
-    const nextMidnight = new Date(now)
-    nextMidnight.setHours(24,0,0,0)
-    const ms = nextMidnight - now
+    const target = (() => { const t = new Date(now); t.setHours(0,0,0,0); if(t <= now) t.setDate(t.getDate()+1); return t })()
+    const ms = target - now
     const totalSec = Math.max(0, Math.floor(ms/1000))
     const h = Math.floor(totalSec/3600)
     const m = Math.floor((totalSec%3600)/60)
     const s = totalSec%60
     cdEl.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`
+
+    // color transition only in the last 3 minutes (numbers only)
+    const windowSec = 180
+    if(totalSec <= windowSec){
+      const t = 1 - (totalSec / windowSec)
+      const from = '#ffd6e7' // light pink
+      const to   = '#8b0000' // dark red
+      cdEl.style.color = lerpColor(from, to, t)
+    } else {
+      cdEl.style.color = '' // reset outside the window
+    }
+
     if(totalSec <= 600){ hud.classList.add('urgent') } else { hud.classList.remove('urgent') }
     if(totalSec === 0){
+      // hide timer and headline, show boom message
+      document.querySelector('header').style.display = 'none'
+      lineEl.style.display = 'none'
+      if(boomMsg){ boomMsg.classList.add('show'); boomMsg.setAttribute('aria-hidden','false') }
+
+      // optional: refresh theme and clear particles
       updateTheme()
       scene.querySelectorAll('.leaf,.flakeTxt,.bomaTxt').forEach(n=>n.remove())
     }
@@ -469,20 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const qr = drawQRCode(ctx, String(memberId), 32, 160, 180); ctx.fillStyle='#cfd2ff'; ctx.font='600 16px Inter, system-ui, sans-serif'; ctx.fillText(memberId, 32, 160 + qr.height + 28);
     return c.toDataURL('image/png');
   }
-  async function buildEmail({ name, topic, notes }){
-    const subject = `Ciao ${name}, benvenuto in lista`;
-    const intro   = `Ciao ${name}, grazie per l’iscrizione. Ho letto ciò che ti interessa e ho preparato una mini guida su misura.`;
-    const bodyByTopic = {
-      'Novità': `Ti terrò aggiornato su release e dietro le quinte. Arriveranno anteprime e inviti riservati.`,
-      'Promo':  `Riceverai offerte selezionate e inviti con priorità. Pochi messaggi, zero spam.`
-    };
-    const custom  = notes && notes.trim() ? `Ho preso nota: “${notes.trim()}”.` : `Se vuoi, rispondi a questa mail e dimmi su cosa vuoi approfondire.`;
-    const outro   = `A presto. Se non vuoi più ricevere messaggi, puoi disiscriverti in un click.`;
-    const memberId = generateMemberId(); const cardUrl = await buildCardImage(name, memberId);
-    const html = [`<p>${intro}</p>`,`<p>${bodyByTopic[topic]||''}</p>`,`<p>${custom}</p>`,`<p style="margin:24px 0 12px;font-weight:700">La tua tessera personale</p>`,`<img src="${cardUrl}" alt="Tessera ${memberId}" style="max-width:100%;height:auto;border-radius:12px"/>`,`<p>${outro}</p>`].join('\n');
-    const text = [intro, bodyByTopic[topic]||'', custom, `Tessera ${memberId}.`, outro].join(' ');
-    return { subject, body: text, html, memberId, cardUrl };
-  }
+
 
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
@@ -494,23 +521,18 @@ document.addEventListener('DOMContentLoaded', () => {
       name: document.getElementById('name').value.trim(),
       email: document.getElementById('email').value.trim(),
       phone: document.getElementById('phone').value.trim(),
-      topic: document.getElementById('topic').value,
-      notes: document.getElementById('notes').value.trim(),
       consent: document.getElementById('privacy').checked,
       signup_iso: new Date().toISOString()
     };
-    const emailDraft = await buildEmail(payload);
-    payload.email_subject = emailDraft.subject;
-    payload.email_body = emailDraft.html;
-    payload.email_body_text = emailDraft.body;
-    payload.member_id = emailDraft.memberId;
-    payload.card_image_data_url = emailDraft.cardUrl;
 
-    const WEBHOOK_URL = 'https://hook.eu2.make.com/ys73jb0nhhenm5ri524xt6qemzd1g0ce';
+    const WEBHOOK_URL = 'https://hook.eu2.make.com/1hdracvbm8kwyvqb884mcpaojem2wd6g';
     try{
-      const res = await fetch(WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      // Use FormData to avoid CORS preflight and let Make parse fields easily
+      const fd = new FormData();
+      Object.entries(payload).forEach(([k,v])=> fd.append(k, String(v)));
+      const res = await fetch(WEBHOOK_URL, { method:'POST', body: fd });
       if(!res.ok) throw new Error('Errore rete');
-      toast('Iscrizione salvata. Controlla la posta.');
+      toast('Iscrizione salvata.');
       e.target.reset(); setOpen(false);
     }catch(err){
       console.error(err); toast('Si è verificato un problema. Riprova tra poco');
