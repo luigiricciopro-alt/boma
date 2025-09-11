@@ -165,6 +165,17 @@
       .leaf,.flakeTxt,.bomaTxt{animation-duration:0s}
     }
 
+    /* Wave themes + dynamic mix */
+    :root{
+      --waveA1: rgba(255,255,255,.28); --waveA2: rgba(255,255,255,.22); --waveA3: rgba(255,255,255,.18);
+      --waveB1: rgba(124,92,255,.35); --waveB2: rgba(124,92,255,.28); --waveB3: rgba(124,92,255,.22);
+      --phase: 0; /* 0..1 progress within the minute */
+    }
+    /* Use color-mix to blend theme A -> B each minute; SVG fill attr remains as fallback */
+    .waves .l1 .move{ fill: color-mix(in srgb, var(--waveA1) calc(var(--phase)*100%), var(--waveB1)); transition: fill .8s linear }
+    .waves .l2 .move{ fill: color-mix(in srgb, var(--waveA2) calc(var(--phase)*100%), var(--waveB2)); transition: fill .8s linear }
+    .waves .l3 .move{ fill: color-mix(in srgb, var(--waveA3) calc(var(--phase)*100%), var(--waveB3)); transition: fill .8s linear }
+
     /* CTA FISSA CENTRATA */
     .floating-cta{
       position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
@@ -192,6 +203,9 @@
     .modal .sheet{
       position:relative; z-index:2; width:100%; max-width:860px; padding:16px;
     }
+
+    /* Nascondi il boom message quando il form (modal) è aperto */
+    body.noscroll #boomMsg { display: none !important; opacity: 0 !important; }
     .card{
       background:var(--card); color:var(--text);
       border:1px solid rgba(255,255,255,.08);
@@ -822,22 +836,41 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+<script>
+// Gradiente dinamico onde: blend A<->B, ciclo di 60s con ping-pong per transizione continua
+(function(){
+  const root = document.documentElement;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){ root.style.setProperty('--phase','0.5'); return; }
+  function tick(){
+    const now = Date.now();
+    const minuteIndex = Math.floor(now/60000);
+    const t = (now % 60000) / 60000; // 0..1 all'interno del minuto
+    const forward = (minuteIndex % 2) === 0; // alterna direzione ogni minuto
+    const phase = forward ? t : 1 - t;
+    root.style.setProperty('--phase', phase.toFixed(4));
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
   <style>
     /* Corner logos: fixed in all four corners */
     .corner-logos{ pointer-events:none; }
     .corner-logo{
       position:fixed;
       width:min(12vw, 68px);
-      opacity:.18;
+      opacity:.22; /* leggermente più visibili in mobile */
       filter: drop-shadow(0 2px 8px rgba(0,0,0,.35));
       user-select:none;
-      z-index:5; /* above waves, below HUD/modals */
+      z-index:8; /* sopra HUD ma sotto modali */
     }
-    @media(min-width:520px){ .corner-logo{ width:64px } }
-    .corner-logo.tl{ top:14px; left:14px }
-    .corner-logo.tr{ top:14px; right:14px }
-    .corner-logo.bl{ bottom:14px; left:14px }
-    .corner-logo.br{ bottom:14px; right:14px }
+    @media(min-width:520px){ .corner-logo{ width:64px; opacity:.18 } }
+    /* Safe areas per notch e gesture bar */
+    .corner-logo.tl{ top:calc(14px + env(safe-area-inset-top)); left:calc(14px + env(safe-area-inset-left)) }
+    .corner-logo.tr{ top:calc(14px + env(safe-area-inset-top)); right:calc(14px + env(safe-area-inset-right)) }
+    .corner-logo.bl{ bottom:calc(14px + env(safe-area-inset-bottom)); left:calc(14px + env(safe-area-inset-left)) }
+    .corner-logo.br{ bottom:calc(14px + env(safe-area-inset-bottom)); right:calc(14px + env(safe-area-inset-right)) }
   </style>
 
   <!-- Corner logos -->
