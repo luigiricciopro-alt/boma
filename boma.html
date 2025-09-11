@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    const target = (() => { const t = new Date(now); t.setHours(0,20,0,0); if(t <= now) t.setDate(t.getDate()+1); return t })()
+    const target = (() => { const t = new Date(now); t.setHours(11,8,0,0); if(t <= now) t.setDate(t.getDate()+1); return t })()
     const ms = target - now
     const totalSec = Math.max(0, Math.floor(ms/1000))
 
