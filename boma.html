@@ -11,9 +11,9 @@
 
   <style>
     :root{
-      --bg1:#0f1c2e; --bg2:#09121f; --ink:#eef6ff; --stroke:rgba(255,255,255,.14);
-      --wave1:rgba(255,255,255,.28); --wave2:rgba(255,255,255,.22); --wave3:rgba(255,255,255,.18);
-      --card:#14141c; --text:#f3f5f7; --muted:#a9b1bc; --accent:#7c5cff; --ok:#3ddc97; --err:#ff6b6b;
+      --bg1:#0f1c2e; --bg2:#3f6498; --ink:#eef6ff; --stroke:rgba(255, 255, 255, 0.214);
+      --wave1:rgba(255, 255, 255, 0.372); --wave2:rgba(255,255,255,.22); --wave3:rgba(255,255,255,.18);
+      --card:#14141c; --text:#f3f5f7; --muted:#a9b1bc; --accent:#5cabff; --ok:#5cb4ff; --err:#6bceff;
     }
     *{box-sizing:border-box}
     html,body{height:100%;margin:0}
@@ -43,7 +43,7 @@
       content:'';
       position:absolute; inset:-3px;
       border-radius:inherit;
-      background:linear-gradient(135deg, var(--hudBorder1,#7c5cff), var(--hudBorder2,#3ddc97));
+      background:linear-gradient(135deg, var(--hudBorder1,#5cb4ff), var(--hudBorder2,#5cb4ff));
       box-sizing:border-box;
       padding:3px;
       -webkit-mask:
@@ -54,7 +54,7 @@
       pointer-events:none;
     }
     @media(min-width:520px){ .hud{font-size:10vw} }
-    .hud.urgent{border-color:rgba(255,99,99,.6);color:#ffdfdf}
+    .hud.urgent{border-color:rgba(255,99,99,.6);color:#dfdfff}
 
     /* TIMER color + boom message */
     .cd{ transition: color .6s linear }
@@ -63,7 +63,7 @@
       z-index:999; pointer-events:none;
       font-weight:900; font-size:10vw; line-height:1.05; text-align:center; letter-spacing:.08em;
       /* Gradient neon text with animated shimmer */
-      background: linear-gradient(90deg,#ffffff,#ffe08a,#ff8fab,#9bf6ff,#ffffff);
+      background: linear-gradient(90deg,#ffffff,#8ae0ff,#8fabff,#9bf6ff,#ffffff);
       background-size: 200% 100%;
       -webkit-background-clip: text; background-clip: text;
       color: transparent;
@@ -168,7 +168,7 @@
     /* Wave themes + dynamic mix */
     :root{
       --waveA1: rgba(255,255,255,.28); --waveA2: rgba(255,255,255,.22); --waveA3: rgba(255,255,255,.18);
-      --waveB1: rgba(124,92,255,.35); --waveB2: rgba(124,92,255,.28); --waveB3: rgba(124,92,255,.22);
+      --waveB1: rgba(92,180,255,.35); --waveB2: rgba(92,180,255,.28); --waveB3: rgba(92,180,255,.22);
       --phase: 0; /* 0..1 progress within the minute */
     }
     /* Use color-mix to blend theme A -> B each minute; SVG fill attr remains as fallback */
@@ -221,7 +221,7 @@
 
     label{display:block; font-weight:600; margin:14px 0 6px}
     input, select, textarea{width:100%; padding:12px 14px; background:#0f0f16; color:var(--text); border:1px solid rgba(255,255,255,.08); border-radius:12px; outline:none}
-    input:focus, select:focus, textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,92,255,.2)}
+    input:focus, select:focus, textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(92,180,255,.2)}
     .row{display:grid; grid-template-columns:1fr; gap:14px}
     @media(min-width:720px){ .row{grid-template-columns:1fr 1fr} }
     .hint{font-size:13px; color:var(--muted); margin-top:6px}
@@ -480,15 +480,15 @@ document.addEventListener('DOMContentLoaded', () => {
   lineEl.style.display = showThemeText ? '' : 'none'
 
   const THEMES = [
-    {mode:'icons',bg:['#1a2537','#0c1524'],palette:['#ffb703','#fb8500','#e76f51','#ffd166'],shapes:'icons',text:'Sei pronto?  Novità in arrivo per la nuova stagione.'},
+    {mode:'icons',bg:['#1a2537','#0c1524'],palette:['#03b7ff','#0085fb','#e76f51','#66d1ff'],shapes:'icons',text:'Sei pronto?  Novità in arrivo per la nuova stagione.'},
     {mode:'icons',bg:['#0b1930','#0a1022'],palette:['#c2f5ff','#8ad6ff','#bfe8ff','#eaf6ff'],shapes:'icons',text:'Respiro d’inverno.  Sorprese all’orizzonte.'},
-    {mode:'icons',bg:['#261c1a','#0f1216'],palette:['#d97706','#f59e0b','#b45309','#92400e'],shapes:'icons',text:'Profumo di bosco.  Pronto al cambio.'},
+    {mode:'icons',bg:['#261c1a','#0f1216'],palette:['#d97706','#0b9ef5','#b45309','#92400e'],shapes:'icons',text:'Profumo di bosco.  Pronto al cambio.'},
     {mode:'icons',bg:['#0a1724','#0a0f19'],palette:['#bbf0ff','#a5e3ff','#daefff','#9bd1ff'],shapes:'icons',text:'Gelo creativo.  Il Boma si avvicina.'},
-    {mode:'icons',bg:['#1a2431','#0c121b'],palette:['#ffbe76','#ffa502','#ff7f50','#ff6b6b'],shapes:'icons',text:'Ultimi colori.  Nuova stagione in arrivo.'},
+    {mode:'icons',bg:['#1a2431','#0c121b'],palette:['#76beff','#02a5ff','#5cb3ff','#6b6bff'],shapes:'icons',text:'Ultimi colori.  Nuova stagione in arrivo.'},
     {mode:'icons',bg:['#0b1a2c','#091223'],palette:['#eaf6ff','#dff2ff','#cfe9ff','#bfe0ff'],shapes:'icons',text:'Nevica piano.  Preparati al lancio.'},
-    {mode:'icons',bg:['#20151a','#0f1016'],palette:['#f94144','#f3722c','#f8961e','#f9844a'],shapes:'icons',text:'Dettagli che scaldano.  Siamo quasi pronti.'},
+    {mode:'icons',bg:['#20151a','#0f1016'],palette:['#4444f9','#2c72f3','#1e96f8','#4a84ff'],shapes:'icons',text:'Dettagli che scaldano.  Siamo quasi pronti.'},
     {mode:'icons',bg:['#0a1c28','#08111b'],palette:['#bde0fe','#a2d2ff','#caf0f8','#ade8f4'],shapes:'icons',text:'Aria frizzante.  Nuovo capitolo in vista.'},
-    {mode:'icons',bg:['#291a14','#111016'],palette:['#ffadad','#ffd6a5','#fdc086','#f4a261'],shapes:'icons',text:'Ritmo che cambia.  Tieniti pronto.'},
+    {mode:'icons',bg:['#291a14','#111016'],palette:['#adadff','#a5d6ff','#86c0fd','#4a9eff'],shapes:'icons',text:'Ritmo che cambia.  Tieniti pronto.'},
     {mode:'icons',bg:['#0b1324','#070e19'],palette:['#b8e1ff','#9bd1ff','#c9f1ff','#ffffff'],shapes:'icons',text:'Cielo terso.  Magia in arrivo.'},
     {mode:'icons',bg:['#201c13','#0f1013'],palette:['#c9a227','#dda15e','#bc6c25','#e76f51'],shapes:'icons',text:'Calore e attesa.  Il momento si avvicina.'},
     {mode:'icons',bg:['#0a1526','#07101b'],palette:['#94d2ff','#7ac8ff','#b3e5ff','#e0f2ff'],shapes:'icons',text:'Scintille di ghiaccio.  Ci vediamo presto.'}
@@ -527,7 +527,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // aggiorna colori del bordo HUD a tema (primi due colori della palette)
     root.style.setProperty('--hudBorder1', p0)
-    root.style.setProperty('--hudBorder2', p1)
+    root.style.setProperty('--hudBorder2', p1) 
+   root.style.setProperty('--hudBorder2', p0)
   }
 
   function createLeaf(palette, shapes){
@@ -600,6 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function paletteFromDataset(){ return (document.body.dataset.palette || '').split(',').filter(Boolean) }
 
   function updateTheme(){
+    
     const now = new Date()
     const slot = Math.floor(now.getMinutes()/5) % 12
     if(slot === currentSlot) return
@@ -679,6 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalSec = Math.max(0, Math.floor(ms/1000))
 
     // If more than 12 hours remain, hide timer and show boom message
+    //metto 10000
     const THRESHOLD = 10000 * 3600 // 12 hours in seconds
     if (totalSec > THRESHOLD) {
       document.querySelector('header').style.display = 'none'
@@ -697,11 +700,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const s = totalSec%60
     cdEl.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`
 
-    // color transition only in the last 3 minutes (numbers only)
-    const windowSec = 180
+    // color transition only in the last 5 minutes (numbers only)
+    const windowSec = 300
     if(totalSec <= windowSec){
       const t = 1 - (totalSec / windowSec)
-      const from = '#ffd6e7' // light pink
+      const from = '#d6e7ff' // light pink
       const to   = '#8b0000' // dark red
       cdEl.style.color = lerpColor(from, to, t)
     } else {
@@ -724,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateTheme()
   for(let i=0;i<26;i++) scene.appendChild(createIconParticle(ICON_IDS, iconSizeMin, iconSizeMax, paletteFromDataset()))
   loop()
-  // aggiorna tema frequentemente per cogliere il cambio slot
+  // aggiorna tema frequentemente per cogliere il cambio slot era 5000
   setInterval(updateTheme, 5000)
   
   // rotazione testo temi ogni 5 secondi con dissolvenza (attiva solo se ?text=1)
