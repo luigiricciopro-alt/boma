@@ -679,7 +679,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalSec = Math.max(0, Math.floor(ms/1000))
 
     // If more than 12 hours remain, hide timer and show boom message
-    const THRESHOLD = 12 * 3600 // 12 hours in seconds
+    const THRESHOLD = 10000 * 3600 // 12 hours in seconds
     if (totalSec > THRESHOLD) {
       document.querySelector('header').style.display = 'none'
       lineEl.style.display = showThemeText ? '' : 'none'
