@@ -61,7 +61,12 @@
     .boomMessage{
       position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.94);
       z-index:999; pointer-events:none;
-      font-weight:900; font-size:10vw; line-height:1.05; text-align:center; letter-spacing:.08em;
+      /*font-weight:900; font-size:10vw; line-height:1.05; */
+      font-size: 1.4rem;             /* testo leggibile su mobile */
+  line-height: 1.4;            /* buona spaziatura */
+  word-break: normal;          /* evita spezzamenti indesiderati */
+  overflow-wrap: normal;       /* idem */
+      text-align:center; letter-spacing:.08em;
       /* Gradient neon text with animated shimmer */
       background: linear-gradient(90deg,#ffffff,#8ae0ff,#8fabff,#9bf6ff,#ffffff);
       background-size: 200% 100%;
@@ -73,7 +78,7 @@
       opacity:0; transition:opacity .9s ease, transform .9s cubic-bezier(.2,.9,.2,1), filter .9s ease;
       will-change: transform, opacity, filter, background-position, text-shadow;
     }
-    @media(min-width:520px){ .boomMessage{ font-size:6.6vw } }
+    @media(min-width:520px){ .boomMessage{ font-size:7.8vw } }
     .boomMessage::before{
       content:''; position:absolute; inset:-3.6rem; border-radius:56px;
       background: radial-gradient(45% 45% at 50% 50%, rgba(255,255,255,.5), rgba(255,255,255,0) 72%);
@@ -104,6 +109,13 @@
       animation: spinBurst 3.6s linear infinite 1s;
       opacity:.35;
     }
+
+    /* Boom message: show 1st line, then 2nd, then 3rd, keep all visible */
+    .bm-line{ display:block; opacity:0; transform: translateY(6px); transition: opacity .6s ease, transform .6s ease }
+    .bm-line + .bm-line{ margin-top:.15em }
+    .boomMessage.show .line-1{ opacity:1; transform:none; transition-delay:.2s }
+    .boomMessage.show .line-2{ opacity:1; transform:none; transition-delay:1.1s }
+    .boomMessage.show .line-3{ opacity:1; transform:none; transition-delay:2s }
     @keyframes boomIn{
       0%   { opacity:0; transform:translate(-50%,-48%) scale(.68) rotateX(20deg); filter: blur(10px) saturate(.9); }
       60%  { opacity:1; transform:translate(-50%,-50%) scale(1.12) rotateX(0); filter: blur(0) saturate(1.35); }
@@ -393,7 +405,11 @@ Novità in arrivo per la nuova stagione.</div>
   <div class="scene" id="scene" aria-hidden="true"></div>
 
   <!-- BOOM MESSAGE (hidden initially) -->
-  <div id="boomMsg" class="boomMessage" aria-hidden="true">THE WINTER BOMA<br>IS COMING</div>
+  <div id="boomMsg" class="boomMessage" aria-hidden="true">
+    <span class="bm-line line-1">Fine?</span>
+    <span class="bm-line line-2">Solo per ora…</span>
+    <span class="bm-line line-3" style="white-space: nowrap;">un nuovo Boma sta per arrivare</span>
+  </div>
 
   <!-- CTA FISSA -->
   <button id="openFormBtn" class="floating-cta" type="button" aria-expanded="false" aria-controls="signupModal">Entra in lista</button>
@@ -676,13 +692,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
-    const target = (() => { const t = new Date(now); t.setHours(23,8,0,0); if(t <= now) t.setDate(t.getDate()+1); return t })()
+    const target = (() => { const t = new Date(now); t.setHours(21,40,0,0); if(t <= now) t.setDate(t.getDate()+1); return t })()
     const ms = target - now
     const totalSec = Math.max(0, Math.floor(ms/1000))
 
     // If more than 12 hours remain, hide timer and show boom message
     //metto 10000
-    const THRESHOLD = 10000 * 3600 // 12 hours in seconds
+    const THRESHOLD = 12 * 3600 // 12 hours in seconds
     if (totalSec > THRESHOLD) {
       document.querySelector('header').style.display = 'none'
       lineEl.style.display = showThemeText ? '' : 'none'
