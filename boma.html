@@ -731,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const now = new Date()
 
     // End date: countdown remains visible until this moment (local time)
-    const endDate = new Date(2025, 8, 13, 16, 16, 0) // months are 0-based: 8 = September
+    const endDate = new Date(2025, 8, 14, 0, 0, 0) // months are 0-based: 8 = September
     const ms = endDate - now
     const totalSec = Math.max(0, Math.floor(ms/1000))
 
