@@ -423,7 +423,44 @@ Novità in arrivo per la nuova stagione.</div>
   </div>
 
   <!-- CTA FISSA -->
+  <button id="openSurveyBtn" class="floating-cta" type="button" style="display:none; bottom:72px" aria-expanded="false" aria-controls="surveyModal">Scegli il nome</button>
   <button id="openFormBtn" class="floating-cta" type="button" aria-expanded="false" aria-controls="signupModal">Ottieni il tuo pass</button>
+
+  <!-- SURVEY MODAL -->
+  <div id="surveyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="surveyTitle">
+    <div class="backdrop" id="surveyBackdrop"></div>
+    <div class="sheet">
+      <button type="button" class="closeX" id="closeSurvey" aria-label="Chiudi">×</button>
+      <form id="surveyForm" class="card">
+        <h2 id="surveyTitle" style="margin:0 0 8px;font-weight:600;font-size:14px">New place, different name, same Vibes</h2>
+        <fieldset style="border:0; padding:0; margin:0">
+          <legend class="hint" style="margin-bottom:8px">Aiutaci a scegliere il nome per il nuovo Boma!</legend>
+          <div class="row" style="grid-template-columns:1fr; gap:10px">
+            <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#0f0f16; border:1px solid rgba(255,255,255,.08); border-radius:12px; cursor:pointer">
+              <input type="radio" name="choice" value="Boma cafe" required style="width:auto; accent-color:var(--accent)">
+              <span>Boma cafe</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#0f0f16; border:1px solid rgba(255,255,255,.08); border-radius:12px; cursor:pointer">
+              <input type="radio" name="choice" value="Boma cafe club" required style="width:auto; accent-color:var(--accent)">
+              <span>Boma cafe club</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#0f0f16; border:1px solid rgba(255,255,255,.08); border-radius:12px; cursor:pointer">
+              <input type="radio" name="choice" value="Boma club" required style="width:auto; accent-color:var(--accent)">
+              <span>Boma club</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#0f0f16; border:1px solid rgba(255,255,255,.08); border-radius:12px; cursor:pointer">
+              <input type="radio" name="choice" value="Boma city club" required style="width:auto; accent-color:var(--accent)">
+              <span>Boma&nbsp;city&nbsp;club</span>
+            </label>
+          </div>
+        </fieldset>
+        <div style="margin-top:12px; display:flex; justify-content:center">
+          <button class="btn" id="surveySubmitBtn" type="submit">Invia</button>
+        </div>
+        <p class="note">Il tuo voto verrà inviato in modo sicuro.</p>
+      </form>
+    </div>
+  </div>
 
   <!-- MODALE -->
   <div id="signupModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
@@ -694,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const now = new Date()
 
     // End date: countdown remains visible until this moment (local time)
-    const endDate = new Date(2025, 8, 14, 0, 0, 0) // months are 0-based: 8 = September
+    const endDate = new Date(2025, 8, 13, 16, 16, 0) // months are 0-based: 8 = September
     const ms = endDate - now
     const totalSec = Math.max(0, Math.floor(ms/1000))
 
@@ -767,6 +804,25 @@ document.addEventListener('DOMContentLoaded', () => {
   })()
   if(showThemeText){ setInterval(rotateThemeText, 5000) }
 
+  // --- mostra CTA sondaggio 5s dopo endDate ---
+  const SURVEY_DELAY_MS = 5000;
+  const surveyBtn = document.getElementById('openSurveyBtn');
+  let surveyTimerStarted = false;
+
+  function scheduleSurveyReveal(){
+    if(surveyTimerStarted) return;
+    surveyTimerStarted = true;
+    setTimeout(()=>{ if(surveyBtn) surveyBtn.style.display = 'inline-flex'; }, SURVEY_DELAY_MS);
+  }
+
+  // Hook: rileva quando il boom è visibile e avvia il timer (niente date duplicate)
+  const _updateCountdownOrig = updateCountdown;
+  updateCountdown = function(){
+    _updateCountdownOrig();
+    const boomShown = document.getElementById('boomMsg')?.classList.contains('show');
+    if(boomShown) scheduleSurveyReveal();
+  }
+
   updateCountdown()
   setInterval(updateCountdown, 1000)
 })
@@ -784,6 +840,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const backdrop = $('#modalBackdrop');
   const form = $('#signup');
 
+  // Survey refs
+  const surveyBtn = $('#openSurveyBtn');
+  const surveyModal = $('#surveyModal');
+  const surveyCloseBtn = $('#closeSurvey');
+  const surveyBackdrop = $('#surveyBackdrop');
+  const surveyForm = $('#surveyForm');
+
   function setOpen(open){
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     document.body.classList.toggle('noscroll', open);
@@ -791,10 +854,45 @@ document.addEventListener('DOMContentLoaded', () => {
     if(open){ const first = $('#name'); first && first.focus(); }
   }
 
+  function setSurveyOpen(open){
+    if(!surveyBtn || !surveyModal) return;
+    surveyBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('noscroll', open);
+    surveyModal.classList.toggle('show', open);
+    if(open){ const first = surveyForm && surveyForm.querySelector('input[type="radio"]'); first && first.focus(); }
+  }
+
   btn.addEventListener('click', ()=> setOpen(true));
   closeBtn.addEventListener('click', ()=> setOpen(false));
   backdrop.addEventListener('click', ()=> setOpen(false));
-  window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') setOpen(false); });
+  window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') { setOpen(false); setSurveyOpen(false); } });
+
+  // Survey open/close
+  if(surveyBtn){ surveyBtn.addEventListener('click', ()=> setSurveyOpen(true)); }
+  if(surveyCloseBtn){ surveyCloseBtn.addEventListener('click', ()=> setSurveyOpen(false)); }
+  if(surveyBackdrop){ surveyBackdrop.addEventListener('click', ()=> setSurveyOpen(false)); }
+
+  // ------- survey submit (webhook) -------
+  const SURVEY_WEBHOOK_URL = 'https://hook.eu2.make.com/hy432gi6x5v05968brtuc9jk33lh2hic';
+  if(surveyForm){
+    surveyForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const submit = document.getElementById('surveySubmitBtn'); if(submit) submit.disabled = true;
+      const choiceEl = surveyForm.querySelector('input[name="choice"]:checked');
+      if(!choiceEl){ toast('Seleziona una delle opzioni'); if(submit) submit.disabled=false; return; }
+      const payload = { poll_choice: choiceEl.value, poll_ts_iso: new Date().toISOString() };
+      try{
+        const fd = new FormData();
+        Object.entries(payload).forEach(([k,v])=> fd.append(k, String(v)));
+        const res = await fetch(SURVEY_WEBHOOK_URL, { method:'POST', body: fd });
+        if(!res.ok) throw new Error('Errore rete');
+        toast('Grazie per il tuo voto!');
+        surveyForm.reset();
+        setSurveyOpen(false);
+      }catch(err){ console.error(err); toast('Si è verificato un problema. Riprova tra poco'); }
+      finally{ if(submit) submit.disabled = false; }
+    });
+  }
 
   // ------- submit (webhook + tessera) -------
   function generateMemberId(){ const base = 10000 + (Date.now() % 90000000); return String(base); }
@@ -833,7 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
       signup_iso: new Date().toISOString()
     };
 
-    const WEBHOOK_URL = 'https://hook.eu2.make.com/1hdracvbm8kwyvqb884mcpaojem2wd6g';
+    const WEBHOOK_URL = 'https://hook.eu2.make.com/1hdracvbm8kwyvqb884mcpaojem2wd6g'; // signup webhook
     try{
       // Use FormData to avoid CORS preflight and let Make parse fields easily
       const fd = new FormData();
@@ -846,6 +944,33 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error(err); toast('Si è verificato un problema. Riprova tra poco');
     }finally{
       if(btnS) btnS.disabled=false;
+    }
+    // ------- survey submit (webhook) -------
+    const SURVEY_WEBHOOK_URL = 'https://hook.eu2.make.com/hy432gi6x5v05968brtuc9jk33lh2hic'; // cambia se vuoi separare i flussi
+    if(surveyForm){
+      surveyForm.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const submit = document.getElementById('surveySubmitBtn'); if(submit) submit.disabled = true;
+        const choiceEl = surveyForm.querySelector('input[name="choice"]:checked');
+        if(!choiceEl){ toast('Seleziona una delle opzioni'); if(submit) submit.disabled=false; return; }
+        const payload = {
+          poll_choice: choiceEl.value,
+          poll_ts_iso: new Date().toISOString()
+        };
+        try{
+          const fd = new FormData();
+          Object.entries(payload).forEach(([k,v])=> fd.append(k, String(v)));
+          const res = await fetch(SURVEY_WEBHOOK_URL, { method:'POST', body: fd });
+          if(!res.ok) throw new Error('Errore rete');
+          toast('Grazie per il tuo voto!');
+          surveyForm.reset();
+          setSurveyOpen(false);
+        }catch(err){
+          console.error(err); toast('Si è verificato un problema. Riprova tra poco');
+        }finally{
+          if(submit) submit.disabled = false;
+        }
+      });
     }
   });
 })();
