@@ -840,7 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
       Object.entries(payload).forEach(([k,v])=> fd.append(k, String(v)));
       const res = await fetch(WEBHOOK_URL, { method:'POST', body: fd });
       if(!res.ok) throw new Error('Errore rete');
-      toast('Grazie, riceverai email nei prossimi giorni.');
+      toast('Grazie, riceverai una email prossimamente.');
       e.target.reset(); setOpen(false);
     }catch(err){
       console.error(err); toast('Si è verificato un problema. Riprova tra poco');
