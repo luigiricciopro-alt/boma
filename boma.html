@@ -507,9 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
   lineEl.style.display = showThemeText ? '' : 'none'
 
   const THEMES = [
-    {mode:'icons',bg:['#1a2537','#0c1524'],palette:['#03b7ff','#0085fb','#e76f51','#66d1ff'],shapes:'icons',text:'Sei pronto?  Novità in arrivo per la nuova stagione.'},
     {mode:'icons',bg:['#0b1930','#0a1022'],palette:['#c2f5ff','#8ad6ff','#bfe8ff','#eaf6ff'],shapes:'icons',text:'Respiro d’inverno.  Sorprese all’orizzonte.'},
-    {mode:'icons',bg:['#261c1a','#0f1216'],palette:['#d97706','#0b9ef5','#b45309','#92400e'],shapes:'icons',text:'Profumo di bosco.  Pronto al cambio.'},
     {mode:'icons',bg:['#0a1724','#0a0f19'],palette:['#bbf0ff','#a5e3ff','#daefff','#9bd1ff'],shapes:'icons',text:'Gelo creativo.  Il Boma si avvicina.'},
     {mode:'icons',bg:['#1a2431','#0c121b'],palette:['#76beff','#02a5ff','#5cb3ff','#6b6bff'],shapes:'icons',text:'Ultimi colori.  Nuova stagione in arrivo.'},
     {mode:'icons',bg:['#0b1a2c','#091223'],palette:['#eaf6ff','#dff2ff','#cfe9ff','#bfe0ff'],shapes:'icons',text:'Nevica piano.  Preparati al lancio.'},
@@ -517,7 +515,6 @@ document.addEventListener('DOMContentLoaded', () => {
     {mode:'icons',bg:['#0a1c28','#08111b'],palette:['#bde0fe','#a2d2ff','#caf0f8','#ade8f4'],shapes:'icons',text:'Aria frizzante.  Nuovo capitolo in vista.'},
     {mode:'icons',bg:['#291a14','#111016'],palette:['#adadff','#a5d6ff','#86c0fd','#4a9eff'],shapes:'icons',text:'Ritmo che cambia.  Tieniti pronto.'},
     {mode:'icons',bg:['#0b1324','#070e19'],palette:['#b8e1ff','#9bd1ff','#c9f1ff','#ffffff'],shapes:'icons',text:'Cielo terso.  Magia in arrivo.'},
-    {mode:'icons',bg:['#201c13','#0f1013'],palette:['#c9a227','#dda15e','#bc6c25','#e76f51'],shapes:'icons',text:'Calore e attesa.  Il momento si avvicina.'},
     {mode:'icons',bg:['#0a1526','#07101b'],palette:['#94d2ff','#7ac8ff','#b3e5ff','#e0f2ff'],shapes:'icons',text:'Scintille di ghiaccio.  Ci vediamo presto.'}
   ]
 
@@ -630,7 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateTheme(){
     
     const now = new Date()
-    const slot = Math.floor(now.getMinutes()/5) % 12
+    const slot = Math.floor(now.getMinutes()/5) % THEMES.length
     if(slot === currentSlot) return
     currentSlot = slot
 
@@ -693,30 +690,24 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateCountdown(){
     const now = new Date()
 
-    // Permanently hide countdown from 00:00 on 14/09/2025 (local time)
-    const endDate = new Date(2025, 8, 13, 0, 0, 0) // months are 0-based: 8 = September
-    if (now >= endDate) {
-      const headerEl = document.querySelector('header')
-      if (headerEl) headerEl.style.display = 'none'
-      // Ensure headline is visible; do NOT hide boom message per request
-      if (lineEl) lineEl.style.display = ''
-      return
-    }
-
-    const target = (() => { const t = new Date(now); t.setHours(0,0,0,0); if(t <= now) t.setDate(t.getDate()+1); return t })()
-    const ms = target - now
+    // End date: countdown remains visible until this moment (local time)
+    const endDate = new Date(2025, 8, 14, 0, 0, 0) // months are 0-based: 8 = September
+    const ms = endDate - now
     const totalSec = Math.max(0, Math.floor(ms/1000))
 
-    // If more than 12 hours remain, hide timer and show boom message
-    //metto 10000
-    const THRESHOLD = 12 * 3600 // 12 hours in seconds
-    if (totalSec > THRESHOLD) {
+    // Show countdown until endDate; after endDate show boom message
+    if (totalSec === 0) {
+      // hide timer and headline, show boom message
       document.querySelector('header').style.display = 'none'
-      lineEl.style.display = showThemeText ? '' : 'none'
+      lineEl.style.display = 'none'
       if (boomMsg) { boomMsg.classList.add('show'); boomMsg.setAttribute('aria-hidden','false') }
+
+      // optional: refresh theme and clear particles
+      updateTheme()
+      //scene.querySelectorAll('.leaf,.flakeTxt,.bomaTxt').forEach(n=>n.remove())
       return
     } else {
-      // Within 12 hours: show timer and hide boom message
+      // before endDate: show timer and hide boom message
       document.querySelector('header').style.display = ''
       lineEl.style.display = showThemeText ? '' : 'none'
       if (boomMsg) { boomMsg.classList.remove('show'); boomMsg.setAttribute('aria-hidden','true') }
@@ -739,16 +730,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if(totalSec <= 600){ hud.classList.add('urgent') } else { hud.classList.remove('urgent') }
-    if(totalSec === 0){
-      // hide timer and headline, show boom message
-      document.querySelector('header').style.display = 'none'
-      lineEl.style.display = 'none'
-      if(boomMsg){ boomMsg.classList.add('show'); boomMsg.setAttribute('aria-hidden','false') }
-
-      // optional: refresh theme and clear particles
-      updateTheme()
-      scene.querySelectorAll('.leaf,.flakeTxt,.bomaTxt').forEach(n=>n.remove())
-    }
   }
 
   updateTheme()
