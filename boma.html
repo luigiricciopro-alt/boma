@@ -423,7 +423,7 @@ Novità in arrivo per la nuova stagione.</div>
   </div>
 
   <!-- CTA FISSA -->
-  <button id="openFormBtn" class="floating-cta" type="button" aria-expanded="false" aria-controls="signupModal">Entra in lista</button>
+  <button id="openFormBtn" class="floating-cta" type="button" aria-expanded="false" aria-controls="signupModal">Ottieni il tuo pass</button>
 
   <!-- MODALE -->
   <div id="signupModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
@@ -431,24 +431,27 @@ Novità in arrivo per la nuova stagione.</div>
     <div class="sheet">
       <button type="button" class="closeX" id="closeForm" aria-label="Chiudi">×</button>
       <form id="signup" class="card" novalidate>
-        <h2 id="signupTitle" style="margin:0 0 8px;font-weight:800;font-size:18px">Iscriviti alla newsletter</h2>
+        <h2 id="signupTitle" style="margin:0 0 8px;font-weight:800;font-size:18px">Ottieni il tuo pass</h2>
 
         <div class="row">
           <div>
-            <label for="name">Nome</label>
-            <input id="name" name="name" type="text" autocomplete="name" required />
+            <label for="name">Nome <span aria-hidden="true" style="color:#ff6b6b">*</span></label>
+            <input id="name" name="name" type="text" autocomplete="name" required aria-required="true" />
+            <div class="hint">Campo obbligatorio</div>
           </div>
           <div>
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" autocomplete="email" required />
+            <label for="email">Email <span aria-hidden="true" style="color:#ff6b6b">*</span></label>
+            <input id="email" name="email" type="email" autocomplete="email" required aria-required="true" />
+            <div class="hint">Campo obbligatorio</div>
           </div>
         </div>
 
         <div class="row">
           <div>
-            <label for="phone">Telefono opzionale</label>
-            <input id="phone" name="phone" type="tel" autocomplete="tel" />
-            <div class="hint">Utile per follow up su WhatsApp.</div>
+            <label for="phone">Telefono <span aria-hidden="true" style="color:#ff6b6b">*</span></label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" required aria-required="true"/>
+            <div class="hint">Campo obbligatorio</div>
+           
           </div>
         </div>
 
@@ -459,7 +462,7 @@ Novità in arrivo per la nuova stagione.</div>
         </div>
 
         <div style="margin-top:12px">
-          <button class="btn" id="submitBtn" type="submit">Iscrivimi</button>
+          <button class="btn" id="submitBtn" type="submit">Conferma</button>
         </div>
 
         <p class="note">I dati vengono inviati a un webhook sicuro.</p>
@@ -691,7 +694,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const now = new Date()
 
     // End date: countdown remains visible until this moment (local time)
-    const endDate = new Date(2025, 8, 14, 0, 0, 0) // months are 0-based: 8 = September
+    const endDate = new Date(2025, 8, 13, 11, 04, 0) // months are 0-based: 8 = September
     const ms = endDate - now
     const totalSec = Math.max(0, Math.floor(ms/1000))
 
@@ -837,7 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
       Object.entries(payload).forEach(([k,v])=> fd.append(k, String(v)));
       const res = await fetch(WEBHOOK_URL, { method:'POST', body: fd });
       if(!res.ok) throw new Error('Errore rete');
-      toast('Iscrizione salvata.');
+      toast('Grazie, riceverai email nei prossimi giorni.');
       e.target.reset(); setOpen(false);
     }catch(err){
       console.error(err); toast('Si è verificato un problema. Riprova tra poco');
