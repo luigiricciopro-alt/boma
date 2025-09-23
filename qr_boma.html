@@ -52,6 +52,26 @@
       margin-top: 15px;
       border-radius: 6px;
     }
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 18px;
+      color: #666;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4285f4;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
   <!-- Libreria html5-qrcode -->
   <script src="https://unpkg.com/html5-qrcode"></script>
@@ -70,8 +90,13 @@
   <div id="scanner-section">
     <h2>Lettore QR Code</h2>
     <div id="reader"></div>
+    <p id="link-text" style="margin-top: 15px; font-weight: bold;"></p>
     <iframe id="link-frame" src=""></iframe>
-    <button id="validate-btn" disabled>Convalida</button>
+    <div id="loading-indicator" class="loading">
+      <div class="spinner"></div>
+      Caricamento contenuto...
+    </div>
+    <button id="validate-btn" disabled>Nuova scansione</button>
   </div>
 
   <script>
@@ -80,6 +105,9 @@
     const loginMsg = document.getElementById('login-msg');
     const loginSection = document.getElementById('login-section');
     const scannerSection = document.getElementById('scanner-section');
+    let html5QrCode; // Istanza globale
+    let scanningEnabled = true; // Flag per abilitare/disabilitare la scansione
+    let currentScannedUrl = ""; // URL attualmente scansionato
 
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -97,23 +125,36 @@
 
     const validateBtn = document.getElementById('validate-btn');
     const linkFrame = document.getElementById('link-frame');
+    const linkText = document.getElementById('link-text');
+    const loadingIndicator = document.getElementById('loading-indicator');
+
+    linkFrame.addEventListener('load', () => {
+      loadingIndicator.style.display = 'none'; // Nasconde il caricamento quando il frame è pronto
+    });
 
     validateBtn.addEventListener('click', () => {
-      alert('Link convalidato:\n' + linkFrame.src);
+      //alert('Link convalidato:\n' + currentScannedUrl);
+      linkFrame.src = ""; // Pulisce il frame
+      loadingIndicator.style.display = 'none'; // Nasconde il caricamento
+      validateBtn.disabled = true;
+      setTimeout(() => {
+        scanningEnabled = true; // Riabilita la scansione dopo un breve delay
+      }, 1000); // 1 secondo per dare tempo di rimuovere il QR precedente
     });
 
     // Funzione per iniziare lo scanner QR
     function startScanner() {
-      const html5QrCode = new Html5Qrcode("reader");
+      html5QrCode = new Html5Qrcode("reader");
 
       const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+        if (!scanningEnabled) return; // Ignora se scansione disabilitata
+
         // Quando QR viene letto con successo
-        html5QrCode.stop().then(() => {
-          linkFrame.src = decodedText;
-          validateBtn.disabled = false;
-        }).catch(err => {
-          console.error('Errore nel fermare lo scanner', err);
-        });
+        currentScannedUrl = decodedText;
+        loadingIndicator.style.display = 'block'; // Mostra il caricamento
+        linkFrame.src = decodedText;
+        validateBtn.disabled = false;
+        scanningEnabled = false; // Disabilita ulteriore scansione fino a convalida
       };
 
       const config = { fps: 10, qrbox: 250 };
