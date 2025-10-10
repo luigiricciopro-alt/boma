@@ -11,9 +11,9 @@
 
   <style>
     :root{
-      --bg1:#0f1c2e; --bg2:#3f6498; --ink:#eef6ff; --stroke:rgba(255, 255, 255, 0.214);
-      --wave1:rgba(255, 255, 255, 0.372); --wave2:rgba(255,255,255,.22); --wave3:rgba(255,255,255,.18);
-      --card:#14141c; --text:#f3f5f7; --muted:#a9b1bc; --accent:#5cabff; --ok:#5cb4ff; --err:#6bceff;
+      --bg1:#0f1c2e; --bg2:#09121f; --ink:#eef6ff; --stroke:rgba(255,255,255,.14);
+      --wave1:rgba(255,255,255,.28); --wave2:rgba(255,255,255,.22); --wave3:rgba(255,255,255,.18);
+      --card:#14141c; --text:#f3f5f7; --muted:#a9b1bc; --accent:#7c5cff; --ok:#3ddc97; --err:#ff6b6b;
     }
     *{box-sizing:border-box}
     html,body{height:100%;margin:0}
@@ -27,49 +27,28 @@
     body.noscroll{overflow:hidden}
 
     /* TIMER */
-    header{position:fixed;inset:0;z-index:6;display:flex;justify-content:center;align-items:center;pointer-events:none}
+    header{position:fixed;left:0;right:0;top:0;z-index:6;display:flex;justify-content:center;pointer-events:none}
     .hud{
-      position:relative;
       margin:12px;
       background:rgba(0,0,0,.28);
-      border:1px solid transparent;
+      border:1px solid var(--stroke);
       padding:10px 14px;border-radius:14px;
       backdrop-filter:blur(8px);
-      font-weight:900;font-size:18vw;line-height:1;
+      font-weight:900;font-size:10.5vw;line-height:1;
       font-variant-numeric:tabular-nums;letter-spacing:.02em;
       text-shadow:0 10px 26px rgba(0,0,0,.35)
     }
-    .hud::after{
-      content:'';
-      position:absolute; inset:-3px;
-      border-radius:inherit;
-      background:linear-gradient(135deg, var(--hudBorder1,#5cb4ff), var(--hudBorder2,#5cb4ff));
-      box-sizing:border-box;
-      padding:3px;
-      -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events:none;
-    }
-    @media(min-width:520px){ .hud{font-size:10vw} }
-    .hud.urgent{border-color:rgba(255,99,99,.6);color:#dfdfff}
+    @media(min-width:520px){ .hud{font-size:6.2vw} }
+    .hud.urgent{border-color:rgba(255,99,99,.6);color:#ffdfdf}
 
     /* TIMER color + boom message */
     .cd{ transition: color .6s linear }
     .boomMessage{
       position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.94);
       z-index:999; pointer-events:none;
-      /*font-weight:900; font-size:10vw; line-height:1.05; */
-      font-size: 1.8rem;             /* mobile più grande */
-      font-weight: 900;              /* grassetto pieno */
-      line-height: 1.35;             /* spaziatura leggermente più compatta */
-      word-break: normal;            /* evita spezzamenti indesiderati */
-      overflow-wrap: normal;         /* idem */
-      text-align:center; letter-spacing:.04em; /* meno tracking per il bold */
+      font-weight:900; font-size:10vw; line-height:1.05; text-align:center; letter-spacing:.08em;
       /* Gradient neon text with animated shimmer */
-      background: linear-gradient(90deg,#ffffff,#8ae0ff,#8fabff,#9bf6ff,#ffffff);
+      background: linear-gradient(90deg,#ffffff,#ffe08a,#ff8fab,#9bf6ff,#ffffff);
       background-size: 200% 100%;
       -webkit-background-clip: text; background-clip: text;
       color: transparent;
@@ -79,7 +58,7 @@
       opacity:0; transition:opacity .9s ease, transform .9s cubic-bezier(.2,.9,.2,1), filter .9s ease;
       will-change: transform, opacity, filter, background-position, text-shadow;
     }
-    @media(min-width:520px){ .boomMessage{ font-size:9vw; font-weight:900 } }
+    @media(min-width:520px){ .boomMessage{ font-size:6.6vw } }
     .boomMessage::before{
       content:''; position:absolute; inset:-3.6rem; border-radius:56px;
       background: radial-gradient(45% 45% at 50% 50%, rgba(255,255,255,.5), rgba(255,255,255,0) 72%);
@@ -110,22 +89,6 @@
       animation: spinBurst 3.6s linear infinite 1s;
       opacity:.35;
     }
-
-    /* Boom message: show 1st line, then 2nd, then 3rd, keep all visible */
-    .bm-line{ display:block; white-space: nowrap; word-break: keep-all; overflow-wrap: normal; opacity:0; transform: translateY(6px); transition: opacity .6s ease, transform .6s ease }
-    .bm-line + .bm-line{ margin-top:.15em }
-    .boomMessage.show .line-1{ opacity:1; transform:none; transition-delay:.2s }
-    .boomMessage.show .line-2{ opacity:1; transform:none; transition-delay:1.1s }
-    .boomMessage.show .line-3{ opacity:1; transform:none; transition-delay:2s }
-    .boomMessage.show .line-4{ opacity:1; transform:none; transition-delay:2.9s }
-
-    /* Mobile-specific reveal timings */
-    @media (max-width: 519.98px) {
-      .boomMessage.show .line-1{ transition-delay:.8s }
-      .boomMessage.show .line-2{ transition-delay:1.8s }
-      .boomMessage.show .line-3{ transition-delay:3s }
-      .boomMessage.show .line-4{ transition-delay:4.4s }
-    }
     @keyframes boomIn{
       0%   { opacity:0; transform:translate(-50%,-48%) scale(.68) rotateX(20deg); filter: blur(10px) saturate(.9); }
       60%  { opacity:1; transform:translate(-50%,-50%) scale(1.12) rotateX(0); filter: blur(0) saturate(1.35); }
@@ -151,11 +114,11 @@
 
     /* HEADLINE */
     .line{
-      position:fixed; left:50%; top:calc(50% + 18vw); transform:translateX(-50%);
-      font-weight:900; font-size:3.2vw; text-align:center; line-height:1.25; max-width:92vw;
-      text-shadow:0 8px 24px rgba(0,0,0,.35); transition:opacity .5s; z-index:4
+      position:fixed;left:50%;top:56%;transform:translate(-50%,-50%);
+      font-weight:900;font-size:5vw;text-align:center;line-height:1.25;max-width:92vw;
+      text-shadow:0 8px 24px rgba(0,0,0,.35);transition:opacity .5s;z-index:4
     }
-    @media(min-width:520px){ .line{ font-size:1.8vw; top:calc(50% + 9vw) } }
+    @media(min-width:520px){ .line{font-size:3.6vw} }
     .line.fade{opacity:.15}
 
     /* PARTICELLE / STAGE */
@@ -164,7 +127,6 @@
     .leaf .rot{display:inline-block;animation:spin 10s linear forwards}
     .flakeTxt{position:absolute;top:-10vh;will-change:transform,opacity;font-size:18px;animation:fallY 14s linear forwards}
     .bomaTxt{position:absolute;top:-10vh;will-change:transform,opacity;animation:fallY 12s linear forwards;font-weight:900;letter-spacing:.06em}
-    .icon-sprite{stroke:currentColor; fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.9}
 
     @keyframes fallY{0%{transform:translate(var(--x,0vw),-10vh)}100%{transform:translate(calc(var(--x,0vw) + var(--drift,0px)),110vh)}}
     @keyframes spin{0%{transform:rotate(var(--r,0deg))}100%{transform:rotate(var(--rEnd,210deg))}}
@@ -186,17 +148,6 @@
       .waves .move{animation-duration:0s}
       .leaf,.flakeTxt,.bomaTxt{animation-duration:0s}
     }
-
-    /* Wave themes + dynamic mix */
-    :root{
-      --waveA1: rgba(255,255,255,.28); --waveA2: rgba(255,255,255,.22); --waveA3: rgba(255,255,255,.18);
-      --waveB1: rgba(92,180,255,.35); --waveB2: rgba(92,180,255,.28); --waveB3: rgba(92,180,255,.22);
-      --phase: 0; /* 0..1 progress within the minute */
-    }
-    /* Use color-mix to blend theme A -> B each minute; SVG fill attr remains as fallback */
-    .waves .l1 .move{ fill: color-mix(in srgb, var(--waveA1) calc(var(--phase)*100%), var(--waveB1)); transition: fill .8s linear }
-    .waves .l2 .move{ fill: color-mix(in srgb, var(--waveA2) calc(var(--phase)*100%), var(--waveB2)); transition: fill .8s linear }
-    .waves .l3 .move{ fill: color-mix(in srgb, var(--waveA3) calc(var(--phase)*100%), var(--waveB3)); transition: fill .8s linear }
 
     /* CTA FISSA CENTRATA */
     .floating-cta{
@@ -225,9 +176,6 @@
     .modal .sheet{
       position:relative; z-index:2; width:100%; max-width:860px; padding:16px;
     }
-
-    /* Nascondi il boom message quando il form (modal) è aperto */
-    body.noscroll #boomMsg { display: none !important; opacity: 0 !important; }
     .card{
       background:var(--card); color:var(--text);
       border:1px solid rgba(255,255,255,.08);
@@ -243,7 +191,7 @@
 
     label{display:block; font-weight:600; margin:14px 0 6px}
     input, select, textarea{width:100%; padding:12px 14px; background:#0f0f16; color:var(--text); border:1px solid rgba(255,255,255,.08); border-radius:12px; outline:none}
-    input:focus, select:focus, textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(92,180,255,.2)}
+    input:focus, select:focus, textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,92,255,.2)}
     .row{display:grid; grid-template-columns:1fr; gap:14px}
     @media(min-width:720px){ .row{grid-template-columns:1fr 1fr} }
     .hint{font-size:13px; color:var(--muted); margin-top:6px}
@@ -266,7 +214,6 @@ Novità in arrivo per la nuova stagione.</div>
 
   <!-- ONDE -->
   <div class="waves" aria-hidden="true">
-    
     <svg class="l1" viewBox="0 0 1200 200" preserveAspectRatio="none">
       <defs><path id="w1" d="M0,120 C150,80 300,160 450,120 C600,80 750,160 900,120 C1050,80 1150,140 1200,120 L1200,200 L0,200 Z"/></defs>
       <g class="move" fill="var(--wave1)"><use href="#w1" x="0"/><use href="#w1" x="1200"/><use href="#w1" x="2400"/></g>
@@ -281,186 +228,14 @@ Novità in arrivo per la nuova stagione.</div>
     </svg>
   </div>
 
-  <!-- SPRITE: icone natalizie -->
-  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-    <!-- Albero -->
-    <symbol id="icon-tree" viewBox="0 0 24 24">
-      <path d="M12 3l-3 4h2l-3 4h2l-4 5h14l-4-5h2l-3-4h2l-3-4z"/>
-      <rect x="10.5" y="19" width="3" height="3" rx="0.6"/>
-    </symbol>
-    <!-- Fiocco di neve -->
-    <symbol id="icon-snow" viewBox="0 0 24 24">
-      <path d="M12 2v20M4 12h16M5 5l14 14M19 5L5 19"/>
-      <path d="M12 2l-2 2M12 2l2 2M12 22l-2-2M12 22l2-2M2 12l2-2M2 12l2 2M22 12l-2-2M22 12l-2 2"/>
-    </symbol>
-    <!-- Regalo -->
-    <symbol id="icon-gift" viewBox="0 0 24 24">
-      <rect x="3" y="8" width="18" height="12" rx="2"/>
-      <path d="M12 8v12M3 14h18"/>
-      <path d="M9.2 8c-1.6 0-3.2-1.1-3.2-2.6 0-1.2 1-2.4 2.6-2.4 1.3 0 2.4.8 3.4 2.5"/>
-      <path d="M14.8 8c1.6 0 3.2-1.1 3.2-2.6 0-1.2-1-2.4-2.6-2.4-1.3 0-2.4.8-3.4 2.5"/>
-    </symbol>
-    <!-- Stella -->
-    <symbol id="icon-star" viewBox="0 0 24 24">
-      <polygon points="12 2 14.9 8.2 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9.1 8.2"/>
-    </symbol>
-    <!-- Pallina -->
-    <symbol id="icon-bauble" viewBox="0 0 24 24">
-      <circle cx="12" cy="13" r="8"/>
-      <rect x="10" y="3" width="4" height="4" rx="1"/>
-      <path d="M12 7v2"/>
-    </symbol>
-    <!-- Cappello di Babbo Natale -->
-    <symbol id="icon-hat" viewBox="0 0 24 24">
-      <path d="M4 18h16"/>
-      <path d="M6 18c0-6 6-8 8-8 0-2-1.5-3-3-3-2 0-3 1-3 3"/>
-      <circle cx="16" cy="7" r="2"/>
-    </symbol>
-    <!-- Renna -->
-    <symbol id="icon-reindeer" viewBox="0 0 24 24">
-      <path d="M7 5l3 2M17 5l-3 2"/>
-      <path d="M12 7a5 5 0 0 0-5 5v2a5 5 0 0 0 10 0v-2a5 5 0 0 0-5-5z"/>
-      <circle cx="10" cy="13" r="1"/>
-      <circle cx="14" cy="13" r="1"/>
-      <circle cx="12" cy="16.5" r="1.2"/>
-    </symbol>
-    <!-- Ghirlanda -->
-    <symbol id="icon-wreath" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="7"/>
-      <circle cx="12" cy="12" r="3.5"/>
-      <path d="M9 3l3 3 3-3M9 21l3-3 3 3"/>
-    </symbol>
-    <!-- Candela -->
-    <symbol id="icon-candle" viewBox="0 0 24 24">
-      <rect x="10" y="8" width="4" height="10" rx="1"/>
-      <path d="M12 4c1.5 1.2 2 2.4 2 3.5 0 1-1 1.5-2 1.5s-2-.5-2-1.5C10 6.4 10.5 5.2 12 4z"/>
-    </symbol>
-    <!-- Omino di pan di zenzero -->
-    <symbol id="icon-gingerbread" viewBox="0 0 24 24">
-      <circle cx="12" cy="7" r="2.5"/>
-      <path d="M9 12a3 3 0 0 1 6 0v3H9z"/>
-      <path d="M7 13l5 2 5-2"/>
-      <path d="M9 21l3-4 3 4"/>
-      <circle cx="11.2" cy="7" r=".4"/>
-      <circle cx="12.8" cy="7" r=".4"/>
-    </symbol>
-    <!-- Agrifoglio -->
-    <symbol id="icon-holly" viewBox="0 0 24 24">
-      <path d="M4 12l3-1 2 2-1 3-2-2-2 1z"/>
-      <path d="M12 4l1 3-2 2-3-1 2-2-1-2z"/>
-      <path d="M20 12l-3-1-2 2 1 3 2-2 2 1z"/>
-      <circle cx="12" cy="12" r="1"/>
-      <circle cx="13.8" cy="13.8" r="1"/>
-      <circle cx="10.2" cy="13.8" r="1"/>
-    </symbol>
-    <!-- Fiocco regalo -->
-    <symbol id="icon-bow" viewBox="0 0 24 24">
-      <path d="M12 12c-1.6 0-3-1.1-3-2.6S10.4 7 12 7s3 1.1 3 2.4-1.4 2.6-3 2.6z"/>
-      <path d="M9 9L4 7v6l5-2"/>
-      <path d="M15 9l5-2v6l-5-2"/>
-      <path d="M12 12v5"/>
-    </symbol>
-    <!-- Stella cometa -->
-    <symbol id="icon-comet" viewBox="0 0 24 24">
-      <polygon points="10 3 11.6 6.4 15 7 12.4 9.6 13 13 10 11.4 7 13 7.6 9.6 5 7 8.4 6.4"/>
-      <path d="M3 15l5-2M2 18l7-3M4 20l6-3"/>
-    </symbol>
-    <!-- Palla di neve -->
-    <symbol id="icon-snowglobe" viewBox="0 0 24 24">
-      <circle cx="12" cy="9" r="5"/>
-      <rect x="7" y="16" width="10" height="4" rx="1"/>
-      <circle cx="10" cy="9" r=".6"/>
-      <circle cx="13" cy="8" r=".6"/>
-      <circle cx="14.5" cy="11" r=".6"/>
-    </symbol>
-    <!-- Guanto -->
-    <symbol id="icon-mitten" viewBox="0 0 24 24">
-      <path d="M6 14a4 4 0 0 1 8 0v2H6z"/>
-      <path d="M14 14c0-2 1.5-3 3-3a2 2 0 0 1 2 2v3h-5"/>
-      <rect x="6" y="16" width="8" height="3" rx="1"/>
-    </symbol>
-    <!-- Presepe stilizzato -->
-    <symbol id="icon-nativity" viewBox="0 0 24 24">
-      <path d="M3 11l9-6 9 6"/>
-      <path d="M5 12v7M19 12v7"/>
-      <path d="M8 19l4-3 4 3"/>
-      <circle cx="12" cy="15.5" r="1.2"/>
-      <path d="M12 3v-1"/>
-      <polygon points="12 4 12.8 5.6 14.6 5.8 13.3 7 13.6 8.8 12 7.9 10.4 8.8 10.7 7 9.4 5.8 11.2 5.6"/>
-    </symbol>
-    <!-- Cappuccino con cannella -->
-    <symbol id="icon-cappuccino" viewBox="0 0 24 24">
-      <path d="M6 10h10v3a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4v-3z"/>
-      <path d="M16 11h2a2 2 0 0 1 0 4h-2"/>
-      <path d="M4 19h14"/>
-      <path d="M9 7c0 1 .8 1.5 1.5 1.8M12 7c0 1 .8 1.5 1.5 1.8M6 7c0 1 .8 1.5 1.5 1.8"/>
-      <path d="M13 8l5-2M12.2 9.2l5-2"/>
-    </symbol>
-
-     <!-- Logo BOMA (vectorizzato da raster, forma a petalo) -->
-     <symbol id="icon-boma-logo" viewBox="0 0 200 200">
-       <g fill="currentColor" stroke="none">
-         <!-- 6 petali identici, ruotati di 60°; forma a goccia -->
-         <path d="M0,-70 C14,-70 14,-28 0,0 C-14,-28 -14,-70 0,-70 Z" transform="translate(100,100) rotate(0)"/>
-         <path d="M0,-70 C14,-70 14,-28 0,0 C-14,-28 -14,-70 0,-70 Z" transform="translate(100,100) rotate(60)"/>
-         <path d="M0,-70 C14,-70 14,-28 0,0 C-14,-28 -14,-70 0,-70 Z" transform="translate(100,100) rotate(120)"/>
-         <path d="M0,-70 C14,-70 14,-28 0,0 C-14,-28 -14,-70 0,-70 Z" transform="translate(100,100) rotate(180)"/>
-         <path d="M0,-70 C14,-70 14,-28 0,0 C-14,-28 -14,-70 0,-70 Z" transform="translate(100,100) rotate(240)"/>
-         <path d="M0,-70 C14,-70 14,-28 0,0 C-14,-28 -14,-70 0,-70 Z" transform="translate(100,100) rotate(300)"/>
-       </g>
-     </symbol>
-  </svg>
-
   <!-- PARTICELLE -->
   <div class="scene" id="scene" aria-hidden="true"></div>
 
   <!-- BOOM MESSAGE (hidden initially) -->
-  <div id="boomMsg" class="boomMessage" aria-hidden="true">
-    <span class="bm-line line-1">Fine?</span>
-    <span class="bm-line line-2">Solo per ora…</span>
-    <span class="bm-line line-3">un nuovo Boma</span>
-    <span class="bm-line line-4">sta per arrivare</span>
-  </div>
+  <div id="boomMsg" class="boomMessage" aria-hidden="true">THE WINTER BOMA<br>IS COMING</div>
 
   <!-- CTA FISSA -->
-  <button id="openSurveyBtn" class="floating-cta" type="button" style="display:none; bottom:72px" aria-expanded="false" aria-controls="surveyModal">Scegli il nome</button>
-  <button id="openFormBtn" class="floating-cta" type="button" aria-expanded="false" aria-controls="signupModal">Ottieni il tuo pass</button>
-
-  <!-- SURVEY MODAL -->
-  <div id="surveyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="surveyTitle">
-    <div class="backdrop" id="surveyBackdrop"></div>
-    <div class="sheet">
-      <button type="button" class="closeX" id="closeSurvey" aria-label="Chiudi">×</button>
-      <form id="surveyForm" class="card">
-        <h2 id="surveyTitle" style="margin:0 0 8px;font-weight:600;font-size:14px">New place, different name, same Vibes</h2>
-        <fieldset style="border:0; padding:0; margin:0">
-          <legend class="hint" style="margin-bottom:8px">Aiutaci a scegliere il nome per il nuovo Boma!</legend>
-          <div class="row" style="grid-template-columns:1fr; gap:10px">
-            <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#0f0f16; border:1px solid rgba(255,255,255,.08); border-radius:12px; cursor:pointer">
-              <input type="radio" name="choice" value="Boma cafe" required style="width:auto; accent-color:var(--accent)">
-              <span>Boma cafe</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#0f0f16; border:1px solid rgba(255,255,255,.08); border-radius:12px; cursor:pointer">
-              <input type="radio" name="choice" value="Boma cafe club" required style="width:auto; accent-color:var(--accent)">
-              <span>Boma cafe club</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#0f0f16; border:1px solid rgba(255,255,255,.08); border-radius:12px; cursor:pointer">
-              <input type="radio" name="choice" value="Boma club" required style="width:auto; accent-color:var(--accent)">
-              <span>Boma club</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:10px; padding:10px; background:#0f0f16; border:1px solid rgba(255,255,255,.08); border-radius:12px; cursor:pointer">
-              <input type="radio" name="choice" value="Boma city club" required style="width:auto; accent-color:var(--accent)">
-              <span>Boma&nbsp;city&nbsp;club</span>
-            </label>
-          </div>
-        </fieldset>
-        <div style="margin-top:12px; display:flex; justify-content:center">
-          <button class="btn" id="surveySubmitBtn" type="submit">Invia</button>
-        </div>
-        <p class="note">Il tuo voto verrà inviato in modo sicuro.</p>
-      </form>
-    </div>
-  </div>
+  <button id="openFormBtn" class="floating-cta" type="button" aria-expanded="false" aria-controls="signupModal">Entra in lista</button>
 
   <!-- MODALE -->
   <div id="signupModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
@@ -468,38 +243,35 @@ Novità in arrivo per la nuova stagione.</div>
     <div class="sheet">
       <button type="button" class="closeX" id="closeForm" aria-label="Chiudi">×</button>
       <form id="signup" class="card" novalidate>
-        <h2 id="signupTitle" style="margin:0 0 8px;font-weight:800;font-size:18px">Ottieni il tuo pass</h2>
+        <h2 id="signupTitle" style="margin:0 0 8px;font-weight:800;font-size:18px">Iscriviti alla newsletter</h2>
 
         <div class="row">
           <div>
-            <label for="name">Nome e cognome<span aria-hidden="true" style="color:#ff6b6b">*</span></label>
-            <input id="name" name="name" type="text" autocomplete="name" required aria-required="true" />
-            <div class="hint">Campo obbligatorio</div>
+            <label for="name">Nome</label>
+            <input id="name" name="name" type="text" autocomplete="name" required />
           </div>
           <div>
-            <label for="email">Email <span aria-hidden="true" style="color:#ff6b6b">*</span></label>
-            <input id="email" name="email" type="email" autocomplete="email" required aria-required="true" />
-            <div class="hint">Campo obbligatorio</div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
           </div>
         </div>
 
         <div class="row">
           <div>
-            <label for="phone">Telefono <span aria-hidden="true" style="color:#ff6b6b">*</span></label>
-            <input id="phone" name="phone" type="tel" autocomplete="tel" required aria-required="true"/>
-            <div class="hint">Campo obbligatorio</div>
-           
+            <label for="phone">Telefono</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" required />
+            <div class="hint">Utile per follow up su WhatsApp.</div>
           </div>
         </div>
 
 
         <div class="checkline" style="display:flex; align-items:flex-start; gap:10px; margin-top:12px">
           <input id="privacy" type="checkbox" required style="width:auto; accent-color:var(--accent)" />
-          <label for="privacy" style="margin:0; font-weight:500">Acconsento al trattamento dei dati secondo la <a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</label>
+          <label for="privacy" style="margin:0; font-weight:500">Acconsento al trattamento dei dati secondo la <a href="#" target="_blank" rel="noopener">Privacy Policy</a>.</label>
         </div>
 
         <div style="margin-top:12px">
-          <button class="btn" id="submitBtn" type="submit">Conferma</button>
+          <button class="btn" id="submitBtn" type="submit">Iscrivimi</button>
         </div>
 
         <p class="note">I dati vengono inviati a un webhook sicuro.</p>
@@ -528,49 +300,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const boomMsg = document.getElementById('boomMsg')
   const root = document.documentElement
 
-  // URL overrides: ?shapes=icons&density=60&sizeMin=20&sizeMax=48&speed=1.5&text=1
-  const params = new URLSearchParams(location.search)
-  const urlShapes = params.get('shapes')
-  const urlDensity = params.get('density')
-  const urlSizeMin = params.get('sizeMin')
-  const urlSizeMax = params.get('sizeMax')
-  const urlSpeed = params.get('speed')
-  const urlText = params.get('text')
-  const showThemeText = !!(urlText && /^(1|true|on|yes)$/i.test(urlText))
-  if(urlShapes){ document.body.dataset.shapes = urlShapes; window.__overrideShapes = true }
-  if(urlDensity){ const n = parseInt(urlDensity,10); if(!isNaN(n)){ targetLeaves = Math.max(4, Math.min(160, n)); window.__overrideDensity = true } }
-  if(urlSizeMin){ const v = parseInt(urlSizeMin,10); if(!isNaN(v)){ iconSizeMin = Math.max(8, Math.min(96, v)) } }
-  if(urlSizeMax){ const v = parseInt(urlSizeMax,10); if(!isNaN(v)){ iconSizeMax = Math.max(iconSizeMin, Math.min(128, v)) } }
-  if(urlSpeed){ const v = parseFloat(urlSpeed); if(!isNaN(v) && v > 0){ speedFactor = Math.max(0.25, Math.min(4, v)) } }
-
-  // di default nasconde il testo dei temi, salvo parametro URL
-  lineEl.style.display = showThemeText ? '' : 'none'
-
   const THEMES = [
-    {mode:'icons',bg:['#0b1930','#0a1022'],palette:['#c2f5ff','#8ad6ff','#bfe8ff','#eaf6ff'],shapes:'icons',text:'Respiro d’inverno.  Sorprese all’orizzonte.'},
-    {mode:'icons',bg:['#0a1724','#0a0f19'],palette:['#bbf0ff','#a5e3ff','#daefff','#9bd1ff'],shapes:'icons',text:'Gelo creativo.  Il Boma si avvicina.'},
-    {mode:'icons',bg:['#1a2431','#0c121b'],palette:['#76beff','#02a5ff','#5cb3ff','#6b6bff'],shapes:'icons',text:'Ultimi colori.  Nuova stagione in arrivo.'},
-    {mode:'icons',bg:['#0b1a2c','#091223'],palette:['#eaf6ff','#dff2ff','#cfe9ff','#bfe0ff'],shapes:'icons',text:'Nevica piano.  Preparati al lancio.'},
-    {mode:'icons',bg:['#20151a','#0f1016'],palette:['#4444f9','#2c72f3','#1e96f8','#4a84ff'],shapes:'icons',text:'Dettagli che scaldano.  Siamo quasi pronti.'},
-    {mode:'icons',bg:['#0a1c28','#08111b'],palette:['#bde0fe','#a2d2ff','#caf0f8','#ade8f4'],shapes:'icons',text:'Aria frizzante.  Nuovo capitolo in vista.'},
-    {mode:'icons',bg:['#291a14','#111016'],palette:['#adadff','#a5d6ff','#86c0fd','#4a9eff'],shapes:'icons',text:'Ritmo che cambia.  Tieniti pronto.'},
-    {mode:'icons',bg:['#0b1324','#070e19'],palette:['#b8e1ff','#9bd1ff','#c9f1ff','#ffffff'],shapes:'icons',text:'Cielo terso.  Magia in arrivo.'},
-    {mode:'icons',bg:['#0a1526','#07101b'],palette:['#94d2ff','#7ac8ff','#b3e5ff','#e0f2ff'],shapes:'icons',text:'Scintille di ghiaccio.  Ci vediamo presto.'}
+    {mode:'autumn',bg:['#1a2537','#0c1524'],palette:['#ffb703','#fb8500','#e76f51','#ffd166'],shapes:'leaves',text:'Sei pronto?  Novità in arrivo per la nuova stagione.'},
+    {mode:'winter',bg:['#0b1930','#0a1022'],palette:['#c2f5ff','#8ad6ff','#bfe8ff','#eaf6ff'],shapes:'flakes',text:'Respiro d’inverno.  Sorprese all’orizzonte.'},
+    {mode:'autumn',bg:['#261c1a','#0f1216'],palette:['#d97706','#f59e0b','#b45309','#92400e'],shapes:'leavesHeavy',text:'Profumo di bosco.  Pronto al cambio.'},
+    {mode:'winter',bg:['#0a1724','#0a0f19'],palette:['#bbf0ff','#a5e3ff','#daefff','#9bd1ff'],shapes:'crystals',text:'Gelo creativo.  Il Boma si avvicina.'},
+    {mode:'autumn',bg:['#1a2431','#0c121b'],palette:['#ffbe76','#ffa502','#ff7f50','#ff6b6b'],shapes:'leavesLite',text:'Ultimi colori.  Nuova stagione in arrivo.'},
+    {mode:'winter',bg:['#0b1a2c','#091223'],palette:['#eaf6ff','#dff2ff','#cfe9ff','#bfe0ff'],shapes:'flakesSoft',text:'Nevica piano.  Preparati al lancio.'},
+    {mode:'autumn',bg:['#20151a','#0f1016'],palette:['#f94144','#f3722c','#f8961e','#f9844a'],shapes:'berries',text:'Dettagli che scaldano.  Siamo quasi pronti.'},
+    {mode:'winter',bg:['#0a1c28','#08111b'],palette:['#bde0fe','#a2d2ff','#caf0f8','#ade8f4'],shapes:'needles',text:'Aria frizzante.  Nuovo capitolo in vista.'},
+    {mode:'autumn',bg:['#291a14','#111016'],palette:['#ffadad','#ffd6a5','#fdc086','#f4a261'],shapes:'leavesRound',text:'Ritmo che cambia.  Tieniti pronto.'},
+    {mode:'winter',bg:['#0b1324','#070e19'],palette:['#b8e1ff','#9bd1ff','#c9f1ff','#ffffff'],shapes:'stars',text:'Cielo terso.  Magia in arrivo.'},
+    {mode:'autumn',bg:['#201c13','#0f1013'],palette:['#c9a227','#dda15e','#bc6c25','#e76f51'],shapes:'acorns',text:'Calore e attesa.  Il momento si avvicina.'},
+    {mode:'winter',bg:['#0a1526','#07101b'],palette:['#94d2ff','#7ac8ff','#b3e5ff','#e0f2ff'],shapes:'shards',text:'Scintille di ghiaccio.  Ci vediamo presto.'}
   ]
 
-  // LEAF_SHAPES removed: replaced by single 'icons' sprite mode
+  const LEAF_SHAPES = [
+    'M50 0 C40 18 30 24 18 30 C30 34 36 38 32 50 C44 46 50 44 50 44 C56 46 68 50 64 38 70 34 82 30 70 24 60 18 50 0 Z',
+    'M50 4 C18 6 6 34 10 56 C14 74 30 90 50 96 C70 90 86 74 90 56 C94 34 82 6 50 4 Z',
+    'M50 6 C36 14 28 24 26 36 C18 40 14 50 18 60 C12 68 18 80 28 84 C34 96 44 100 50 100 C56 100 66 96 72 84 C82 80 88 68 82 60 C86 50 82 40 74 36 C72 24 64 14 50 6 Z',
+    'M50 8 C30 10 16 20 12 34 C22 46 36 52 50 52 C64 52 78 46 88 34 C84 20 70 10 50 8 Z'
+  ]
 
   let currentSlot = -1
   let targetLeaves = 40
   let lastBomaAt = 0
-
-  // Icon size + speed controls (overridable via URL)
-  let iconSizeMin = 22
-  let iconSizeMax = 36
-  // speedFactor: 1 = normale; 2 = doppia velocità; 0.5 = metà veloce (più lento)
-  let speedFactor = 1
-
-  const ICON_IDS = ['icon-tree','icon-snow','icon-gift','icon-star','icon-bauble','icon-hat','icon-reindeer','icon-wreath','icon-candle','icon-gingerbread','icon-holly','icon-bow','icon-comet','icon-snowglobe','icon-mitten','icon-nativity','icon-cappuccino']
 
   const pick = arr => arr[Math.floor(Math.random()*arr.length)]
   const setBackground = (c1,c2) => { root.style.setProperty('--bg1',c1); root.style.setProperty('--bg2',c2) }
@@ -588,11 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
     root.style.setProperty('--wave1', col(p0, .34))
     root.style.setProperty('--wave2', col(p1, .26))
     root.style.setProperty('--wave3', col(p2, .22))
-
-    // aggiorna colori del bordo HUD a tema (primi due colori della palette)
-    root.style.setProperty('--hudBorder1', p0)
-    root.style.setProperty('--hudBorder2', p1) 
-   root.style.setProperty('--hudBorder2', p0)
   }
 
   function createLeaf(palette, shapes){
@@ -665,9 +414,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function paletteFromDataset(){ return (document.body.dataset.palette || '').split(',').filter(Boolean) }
 
   function updateTheme(){
-    
     const now = new Date()
-    const slot = Math.floor(now.getMinutes()/5) % THEMES.length
+    const slot = Math.floor(now.getMinutes()/5) % 12
     if(slot === currentSlot) return
     currentSlot = slot
 
@@ -675,44 +423,42 @@ document.addEventListener('DOMContentLoaded', () => {
     setBackground(t.bg[0], t.bg[1])
     setWaves(t.palette)
 
-    // aggiorna solo palette/sfondo; il testo ora viene aggiornato separatamente ogni 5s
-    if(!window.__overrideDensity){
-      targetLeaves = 36 + Math.floor(Math.random()*10)
-    }
+    lineEl.classList.add('fade')
+    setTimeout(()=>{
+      // Insert a line break after periods so the second sentence goes to a new line
+      const formatted = (t.text || '').replace(/\. +(?=\S)/g, '.<br>')
+      lineEl.innerHTML = formatted
+      lineEl.classList.remove('fade')
+    }, 260)
+
+    targetLeaves = 36 + Math.floor(Math.random()*10)
     scene.querySelectorAll('.leaf,.flakeTxt,.bomaTxt').forEach(n=>n.remove())
 
-    if(!window.__overrideShapes){
-      document.body.dataset.shapes = t.shapes
-    }
+    document.body.dataset.shapes = t.shapes
     document.body.dataset.palette = t.palette.join(',')
   }
 
-  function createIconParticle(idList, sizeMin=22, sizeMax=32, paletteColors=null){
-    const el = document.createElement('div'); el.className = 'leaf'
-    const size = Math.floor(Math.random()*(sizeMax-sizeMin)+sizeMin)
-    const startX = Math.random()*100
-    const driftPx = Math.floor(Math.random()*120 - 60)
-    const dur = 7 + Math.random()*9
-    const id = idList[Math.floor(Math.random()*idList.length)]
-    const palette = (paletteColors && paletteColors.length) ? paletteColors : paletteFromDataset()
-    const col = palette[Math.floor(Math.random()*palette.length)] || '#ffffff'
-    el.style.setProperty('--x', startX+'vw')
-    el.style.setProperty('--drift', driftPx+'px')
-    el.style.animationDuration = (dur / speedFactor)+'s'
-    el.innerHTML = `<div class="rot" style="animation-duration:${(dur*0.9/speedFactor).toFixed(2)}s; color:${col}"><svg width="${size}" height="${size}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="icon-sprite"><use href="#${id}"/></svg></div>`
-    el.addEventListener('animationend', ()=> el.remove())
-    return el
-  }
-
   function loop(){
-    const shapesKey = document.body.dataset.shapes || 'icons'
+    const shapesKey = document.body.dataset.shapes || 'leaves'
     const palette = paletteFromDataset()
-    const iconsNow = scene.querySelectorAll('.leaf').length
+    const leavesNow = scene.querySelectorAll('.leaf').length
+    const flakesNow = scene.querySelectorAll('.flakeTxt').length
 
-    if(shapesKey === 'icons' && iconsNow < targetLeaves) scene.appendChild(createIconParticle(ICON_IDS, iconSizeMin, iconSizeMax, palette))
+    if(shapesKey.startsWith('leaves') && leavesNow < targetLeaves) scene.appendChild(createLeaf(palette, LEAF_SHAPES))
+    if(shapesKey === 'leavesHeavy' && leavesNow < targetLeaves+8) scene.appendChild(createLeaf(palette, LEAF_SHAPES))
+    if(shapesKey === 'leavesLite'  && leavesNow < Math.max(24, targetLeaves-8)) scene.appendChild(createLeaf(palette, LEAF_SHAPES))
+
+    if(shapesKey === 'flakes'      && flakesNow < 20) scene.appendChild(createTextParticle(['❄','✻','✼','✽'], 16, 24))
+    if(shapesKey === 'flakesSoft'  && flakesNow < 26) scene.appendChild(createTextParticle(['❄','•','·','✶'], 14, 22))
+    if(shapesKey === 'crystals'    && flakesNow < 18) scene.appendChild(createTextParticle(['❄','•','·','✶'], 14, 26))
+    if(shapesKey === 'stars'       && flakesNow < 22) scene.appendChild(createTextParticle(['✦','✧','✩','✫','✯'], 14, 20))
+    if(shapesKey === 'needles'     && flakesNow < 18) scene.appendChild(createTextParticle(['❧','☙','❦','❧'], 12, 18))
+    if(shapesKey === 'berries'     && flakesNow < 16) scene.appendChild(createTextParticle(['●','•','◍'], 10, 14))
+    if(shapesKey === 'acorns'      && flakesNow < 14) scene.appendChild(createTextParticle(['⬤','◐','◑'], 12, 18))
+    if(shapesKey === 'shards'      && flakesNow < 20) scene.appendChild(createTextParticle(['▴','▵','▾','▿','◢','◣'], 10, 26))
 
     const now = performance.now()
-    if(now - lastBomaAt > 6000 + Math.random()*5000){
+    if(now - lastBomaAt > 1800 + Math.random()*2000){
       lastBomaAt = now
       scene.appendChild(createBomaText(palette))
     }
@@ -730,26 +476,31 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateCountdown(){
     const now = new Date()
 
-    // End date: countdown remains visible until this moment (local time)
+    // Permanently hide countdown from 00:00 on 14/09/2025 (local time)
     const endDate = new Date(2025, 8, 14, 0, 0, 0) // months are 0-based: 8 = September
-    const ms = endDate - now
+    if (now >= endDate) {
+      const headerEl = document.querySelector('header')
+      if (headerEl) headerEl.style.display = 'none'
+      // Ensure headline is visible; do NOT hide boom message per request
+      if (lineEl) lineEl.style.display = ''
+      return
+    }
+
+    const target = (() => { const t = new Date(now); t.setHours(11,8,0,0); if(t <= now) t.setDate(t.getDate()+1); return t })()
+    const ms = target - now
     const totalSec = Math.max(0, Math.floor(ms/1000))
 
-    // Show countdown until endDate; after endDate show boom message
-    if (totalSec === 0) {
-      // hide timer and headline, show boom message
+    // If more than 12 hours remain, hide timer and show boom message
+    const THRESHOLD = 12 * 3600 // 12 hours in seconds
+    if (totalSec > THRESHOLD) {
       document.querySelector('header').style.display = 'none'
       lineEl.style.display = 'none'
       if (boomMsg) { boomMsg.classList.add('show'); boomMsg.setAttribute('aria-hidden','false') }
-
-      // optional: refresh theme and clear particles
-      updateTheme()
-      //scene.querySelectorAll('.leaf,.flakeTxt,.bomaTxt').forEach(n=>n.remove())
       return
     } else {
-      // before endDate: show timer and hide boom message
+      // Within 12 hours: show timer and hide boom message
       document.querySelector('header').style.display = ''
-      lineEl.style.display = showThemeText ? '' : 'none'
+      lineEl.style.display = ''
       if (boomMsg) { boomMsg.classList.remove('show'); boomMsg.setAttribute('aria-hidden','true') }
     }
 
@@ -758,11 +509,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const s = totalSec%60
     cdEl.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`
 
-    // color transition only in the last 5 minutes (numbers only)
-    const windowSec = 300
+    // color transition only in the last 3 minutes (numbers only)
+    const windowSec = 180
     if(totalSec <= windowSec){
       const t = 1 - (totalSec / windowSec)
-      const from = '#d6e7ff' // light pink
+      const from = '#ffd6e7' // light pink
       const to   = '#8b0000' // dark red
       cdEl.style.color = lerpColor(from, to, t)
     } else {
@@ -770,59 +521,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if(totalSec <= 600){ hud.classList.add('urgent') } else { hud.classList.remove('urgent') }
+    if(totalSec === 0){
+      // hide timer and headline, show boom message
+      document.querySelector('header').style.display = 'none'
+      lineEl.style.display = 'none'
+      if(boomMsg){ boomMsg.classList.add('show'); boomMsg.setAttribute('aria-hidden','false') }
+
+      // optional: refresh theme and clear particles
+      updateTheme()
+      scene.querySelectorAll('.leaf,.flakeTxt,.bomaTxt').forEach(n=>n.remove())
+    }
   }
 
   updateTheme()
-  for(let i=0;i<26;i++) scene.appendChild(createIconParticle(ICON_IDS, iconSizeMin, iconSizeMax, paletteFromDataset()))
+  for(let i=0;i<26;i++) scene.appendChild(createLeaf(['#ffb703','#fb8500','#e76f51'], LEAF_SHAPES))
   loop()
-  // aggiorna tema frequentemente per cogliere il cambio slot era 5000
   setInterval(updateTheme, 5000)
-  
-  // rotazione testo temi ogni 5 secondi con dissolvenza (attiva solo se ?text=1)
-  let themeTextIndex = 0
-  function rotateThemeText(){
-    if(!showThemeText) return
-    const t = THEMES[currentSlot >= 0 ? currentSlot : 0]
-    if(!t) return
-    const parts = (t.text || '').split(/\.+\s*/).filter(Boolean) // separa sulle frasi
-    if(parts.length === 0) return
-    themeTextIndex = (themeTextIndex + 1) % parts.length
-    const next = parts[themeTextIndex]
-    lineEl.classList.add('fade')
-    setTimeout(()=>{
-      lineEl.innerHTML = next
-      lineEl.classList.remove('fade')
-    }, 260)
-  }
-  // inizializza il testo solo se abilitato
-  ;(function initThemeText(){
-    if(!showThemeText) return
-    const t = THEMES[currentSlot >= 0 ? currentSlot : 0]
-    if(!t) return
-    const parts = (t.text || '').split(/\.+\s*/).filter(Boolean)
-    if(parts.length){ lineEl.innerHTML = parts[0] }
-  })()
-  if(showThemeText){ setInterval(rotateThemeText, 5000) }
-
-  // --- mostra CTA sondaggio 5s dopo endDate ---
-  const SURVEY_DELAY_MS = 2000;
-  const surveyBtn = document.getElementById('openSurveyBtn');
-  let surveyTimerStarted = false;
-
-  function scheduleSurveyReveal(){
-    if(surveyTimerStarted) return;
-    surveyTimerStarted = true;
-    setTimeout(()=>{ if(surveyBtn) surveyBtn.style.display = 'inline-flex'; }, SURVEY_DELAY_MS);
-  }
-
-  // Hook: rileva quando il boom è visibile e avvia il timer (niente date duplicate)
-  const _updateCountdownOrig = updateCountdown;
-  updateCountdown = function(){
-    _updateCountdownOrig();
-    const boomShown = document.getElementById('boomMsg')?.classList.contains('show');
-    if(boomShown) scheduleSurveyReveal();
-  }
-
   updateCountdown()
   setInterval(updateCountdown, 1000)
 })
@@ -840,13 +554,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const backdrop = $('#modalBackdrop');
   const form = $('#signup');
 
-  // Survey refs
-  const surveyBtn = $('#openSurveyBtn');
-  const surveyModal = $('#surveyModal');
-  const surveyCloseBtn = $('#closeSurvey');
-  const surveyBackdrop = $('#surveyBackdrop');
-  const surveyForm = $('#surveyForm');
-
   function setOpen(open){
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     document.body.classList.toggle('noscroll', open);
@@ -854,48 +561,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if(open){ const first = $('#name'); first && first.focus(); }
   }
 
-  function setSurveyOpen(open){
-    if(!surveyBtn || !surveyModal) return;
-    surveyBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    document.body.classList.toggle('noscroll', open);
-    surveyModal.classList.toggle('show', open);
-    if(open){ const first = surveyForm && surveyForm.querySelector('input[type="radio"]'); first && first.focus(); }
-  }
-
   btn.addEventListener('click', ()=> setOpen(true));
   closeBtn.addEventListener('click', ()=> setOpen(false));
   backdrop.addEventListener('click', ()=> setOpen(false));
-  window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') { setOpen(false); setSurveyOpen(false); } });
+  window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') setOpen(false); });
 
-  // Survey open/close
-  if(surveyBtn){ surveyBtn.addEventListener('click', ()=> setSurveyOpen(true)); }
-  if(surveyCloseBtn){ surveyCloseBtn.addEventListener('click', ()=> setSurveyOpen(false)); }
-  if(surveyBackdrop){ surveyBackdrop.addEventListener('click', ()=> setSurveyOpen(false)); }
-
-  // ------- survey submit (webhook) -------
-  const SURVEY_WEBHOOK_URL = 'https://hook.eu2.make.com/hy432gi6x5v05968brtuc9jk33lh2hic';
-  if(surveyForm){
-    surveyForm.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const submit = document.getElementById('surveySubmitBtn'); if(submit) submit.disabled = true;
-      const choiceEl = surveyForm.querySelector('input[name="choice"]:checked');
-      if(!choiceEl){ toast('Seleziona una delle opzioni'); if(submit) submit.disabled=false; return; }
-      const payload = { poll_choice: choiceEl.value, poll_ts_iso: new Date().toISOString() };
-      try{
-        const fd = new FormData();
-        Object.entries(payload).forEach(([k,v])=> fd.append(k, String(v)));
-        const res = await fetch(SURVEY_WEBHOOK_URL, { method:'POST', body: fd });
-        if(!res.ok) throw new Error('Errore rete');
-        toast('Grazie per il tuo voto!');
-        surveyForm.reset();
-        setSurveyOpen(false);
-      }catch(err){ console.error(err); toast('Si è verificato un problema. Riprova tra poco'); }
-      finally{ if(submit) submit.disabled = false; }
-    });
+  // ------- validation functions -------
+  function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  }
+  function validatePhone(phone) {
+    const re = /^(?:\+?39\s?)?\d{2,3}\s?\d{6,8}$/;
+    return re.test(phone.replace(/\s/g, ''));
   }
 
   // ------- submit (webhook + tessera) -------
   function generateMemberId(){ const base = 10000 + (Date.now() % 90000000); return String(base); }
+  function generateIdTessera(name, email, phone){
+    const str = name + email + phone;
+    let h = 0;
+    for (let i = 0; i < str.length; i++) {
+      h = ((h << 5) - h) + str.charCodeAt(i);
+      h = h & h;
+    }
+    return Math.abs(h).toString(36).toUpperCase().slice(0, 6);
+  }
   function drawQRCode(ctx, text, x, y, size){
     const qr = qrcode(0, 'M'); qr.addData(text); qr.make();
     const n = qr.getModuleCount(); const scale = Math.max(2, Math.floor(size / n)); const sizePx = n * scale;
@@ -920,104 +611,74 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
     const btnS = document.getElementById('submitBtn'); if(btnS) btnS.disabled = true;
-    if(!document.getElementById('name').value || !document.getElementById('email').value || document.getElementById('privacy').checked !== true){
-      toast('Compila i campi obbligatori e dai il consenso'); if(btnS) btnS.disabled=false; return;
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const privacy = document.getElementById('privacy').checked;
+    if(!name || !email || !phone || !privacy){
+      toast('Compila tutti i campi obbligatori e dai il consenso'); if(btnS) btnS.disabled=false; return;
     }
-    const payload = {
-      name: document.getElementById('name').value.trim(),
-      email: document.getElementById('email').value.trim(),
-      phone: document.getElementById('phone').value.trim(),
-      consent: document.getElementById('privacy').checked,
-      signup_iso: new Date().toISOString()
-    };
+    if(!validateEmail(email)){
+      toast('Inserisci un indirizzo email valido.'); if(btnS) btnS.disabled=false; return;
+    }
+    if(!validatePhone(phone)){
+      toast('Inserisci un numero di telefono italiano valido (es. +39 123 4567890).'); if(btnS) btnS.disabled=false; return;
+    }
+    // Get IP address for privacy consent logging
+    let ipAddress = '';
+    try {
+      const ipRes = await fetch('https://api.ipify.org?format=json');
+      const ipData = await ipRes.json();
+      ipAddress = ipData.ip;
+    } catch (err) {
+      console.warn('Could not fetch IP address:', err);
+    }
+    function formatDateTime(date) {
+      const options = {
+        timeZone: 'Europe/Rome',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      };
+      const formatter = new Intl.DateTimeFormat('it-IT', options);
+      const parts = formatter.formatToParts(date);
+      const map = {};
+      parts.forEach(({ type, value }) => {
+        map[type] = value;
+      });
+      return `${map.day}/${map.month}/${map.year} ${map.hour}:${map.minute}:${map.second}`;
+    }
 
-    const WEBHOOK_URL = 'https://hook.eu2.make.com/1hdracvbm8kwyvqb884mcpaojem2wd6g'; // signup webhook
+    const payload = {
+      name: name,
+      email: email,
+      phone: phone,
+      consent: privacy,
+      signup_iso: formatDateTime(new Date()),
+      ip_address: ipAddress,
+      user_agent: navigator.userAgent
+    };
+    payload.id_tessera = generateIdTessera(payload.name, payload.email, payload.phone);
+    const WEBHOOK_URL = 'https://hook.eu2.make.com/1hdracvbm8kwyvqb884mcpaojem2wd6g';
     try{
       // Use FormData to avoid CORS preflight and let Make parse fields easily
       const fd = new FormData();
       Object.entries(payload).forEach(([k,v])=> fd.append(k, String(v)));
       const res = await fetch(WEBHOOK_URL, { method:'POST', body: fd });
       if(!res.ok) throw new Error('Errore rete');
-      toast('Grazie, riceverai una email prossimamente.');
+      toast('Iscrizione salvata.');
       e.target.reset(); setOpen(false);
     }catch(err){
       console.error(err); toast('Si è verificato un problema. Riprova tra poco');
     }finally{
       if(btnS) btnS.disabled=false;
     }
-    // ------- survey submit (webhook) -------
-    const SURVEY_WEBHOOK_URL = 'https://hook.eu2.make.com/hy432gi6x5v05968brtuc9jk33lh2hic'; // cambia se vuoi separare i flussi
-    if(surveyForm){
-      surveyForm.addEventListener('submit', async (e)=>{
-        e.preventDefault();
-        const submit = document.getElementById('surveySubmitBtn'); if(submit) submit.disabled = true;
-        const choiceEl = surveyForm.querySelector('input[name="choice"]:checked');
-        if(!choiceEl){ toast('Seleziona una delle opzioni'); if(submit) submit.disabled=false; return; }
-        const payload = {
-          poll_choice: choiceEl.value,
-          poll_ts_iso: new Date().toISOString()
-        };
-        try{
-          const fd = new FormData();
-          Object.entries(payload).forEach(([k,v])=> fd.append(k, String(v)));
-          const res = await fetch(SURVEY_WEBHOOK_URL, { method:'POST', body: fd });
-          if(!res.ok) throw new Error('Errore rete');
-          toast('Grazie per il tuo voto!');
-          surveyForm.reset();
-          setSurveyOpen(false);
-        }catch(err){
-          console.error(err); toast('Si è verificato un problema. Riprova tra poco');
-        }finally{
-          if(submit) submit.disabled = false;
-        }
-      });
-    }
   });
 })();
 </script>
-<script>
-// Gradiente dinamico onde: blend A<->B, ciclo di 60s con ping-pong per transizione continua
-(function(){
-  const root = document.documentElement;
-  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduce){ root.style.setProperty('--phase','0.5'); return; }
-  function tick(){
-    const now = Date.now();
-    const minuteIndex = Math.floor(now/60000);
-    const t = (now % 60000) / 60000; // 0..1 all'interno del minuto
-    const forward = (minuteIndex % 2) === 0; // alterna direzione ogni minuto
-    const phase = forward ? t : 1 - t;
-    root.style.setProperty('--phase', phase.toFixed(4));
-    requestAnimationFrame(tick);
-  }
-  tick();
-})();
-</script>
-  <style>
-    /* Corner logos: fixed in all four corners */
-    .corner-logos{ pointer-events:none; }
-    .corner-logo{
-      position:fixed;
-      width:min(12vw, 68px);
-      opacity:.22; /* leggermente più visibili in mobile */
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,.35));
-      user-select:none;
-      z-index:8; /* sopra HUD ma sotto modali */
-    }
-    @media(min-width:520px){ .corner-logo{ width:64px; opacity:.18 } }
-    /* Safe areas per notch e gesture bar */
-    .corner-logo.tl{ top:calc(14px + env(safe-area-inset-top)); left:calc(14px + env(safe-area-inset-left)) }
-    .corner-logo.tr{ top:calc(14px + env(safe-area-inset-top)); right:calc(14px + env(safe-area-inset-right)) }
-    .corner-logo.bl{ bottom:calc(14px + env(safe-area-inset-bottom)); left:calc(14px + env(safe-area-inset-left)) }
-    .corner-logo.br{ bottom:calc(14px + env(safe-area-inset-bottom)); right:calc(14px + env(safe-area-inset-right)) }
-  </style>
-
-  <!-- Corner logos -->
-  <div class="corner-logos" aria-hidden="true">
-    <img class="corner-logo tl" src="logo_boma.jpg" alt="" />
-    <img class="corner-logo tr" src="logo_boma.jpg" alt="" />
-    <img class="corner-logo bl" src="logo_boma.jpg" alt="" />
-    <img class="corner-logo br" src="logo_boma.jpg" alt="" />
-  </div>
 </body>
 </html>
