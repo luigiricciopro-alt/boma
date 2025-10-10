@@ -90,6 +90,7 @@
   <div id="scanner-section">
     <h2>Lettore QR Code</h2>
     <div id="reader"></div>
+    <input type="text" id="external-qr-input" placeholder="Scansiona QR code con lettore esterno qui" style="width: 100%; padding: 8px; margin: 10px 0; box-sizing: border-box;" />
     <p id="link-text" style="margin-top: 15px; font-weight: bold;"></p>
     <iframe id="link-frame" src=""></iframe>
     <div id="loading-indicator" class="loading">
@@ -127,6 +128,7 @@
     const linkFrame = document.getElementById('link-frame');
     const linkText = document.getElementById('link-text');
     const loadingIndicator = document.getElementById('loading-indicator');
+    const externalQrInput = document.getElementById('external-qr-input');
 
     linkFrame.addEventListener('load', () => {
       loadingIndicator.style.display = 'none'; // Nasconde il caricamento quando il frame è pronto
@@ -139,7 +141,22 @@
       validateBtn.disabled = true;
       setTimeout(() => {
         scanningEnabled = true; // Riabilita la scansione dopo un breve delay
+        externalQrInput.focus(); // Focus the external input for next scan
       }, 1000); // 1 secondo per dare tempo di rimuovere il QR precedente
+    });
+
+    externalQrInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const text = e.target.value.trim();
+        if (text && scanningEnabled) {
+          currentScannedUrl = text;
+          linkText.textContent = 'QR Code letto: ' + text;
+          loadingIndicator.style.display = 'block';
+          linkFrame.src = "https://script.google.com/macros/s/AKfycbzsgKDFP2fs0A2mIDzrFY4Imy-owVvgMdZRKn0iJzVy-zYhV8AmheEhOKa6Y63gVStKWA/exec?id_tessera=" + text;
+          validateBtn.disabled = false;
+          scanningEnabled = false;
+        }
+      }
     });
 
     // Funzione per iniziare lo scanner QR
@@ -152,7 +169,7 @@
         // Quando QR viene letto con successo
         currentScannedUrl = decodedText;
         loadingIndicator.style.display = 'block'; // Mostra il caricamento
-        linkFrame.src = decodedText;
+        linkFrame.src = "https://script.google.com/macros/s/AKfycbzsgKDFP2fs0A2mIDzrFY4Imy-owVvgMdZRKn0iJzVy-zYhV8AmheEhOKa6Y63gVStKWA/exec?id_tessera=" + decodedText;
         validateBtn.disabled = false;
         scanningEnabled = false; // Disabilita ulteriore scansione fino a convalida
       };
