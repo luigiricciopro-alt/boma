@@ -209,8 +209,7 @@
   </header>
 
   <!-- HEADLINE -->
-  <div id="line" class="line">Sei pronto?
-Novità in arrivo per la nuova stagione.</div>
+  <div id="line" class="line"></div>
 
   <!-- ONDE -->
   <div class="waves" aria-hidden="true">
@@ -301,18 +300,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const root = document.documentElement
 
   const THEMES = [
-    {mode:'autumn',bg:['#1a2537','#0c1524'],palette:['#ffb703','#fb8500','#e76f51','#ffd166'],shapes:'leaves',text:'Sei pronto?  Novità in arrivo per la nuova stagione.'},
-    {mode:'winter',bg:['#0b1930','#0a1022'],palette:['#c2f5ff','#8ad6ff','#bfe8ff','#eaf6ff'],shapes:'flakes',text:'Respiro d’inverno.  Sorprese all’orizzonte.'},
-    {mode:'autumn',bg:['#261c1a','#0f1216'],palette:['#d97706','#f59e0b','#b45309','#92400e'],shapes:'leavesHeavy',text:'Profumo di bosco.  Pronto al cambio.'},
-    {mode:'winter',bg:['#0a1724','#0a0f19'],palette:['#bbf0ff','#a5e3ff','#daefff','#9bd1ff'],shapes:'crystals',text:'Gelo creativo.  Il Boma si avvicina.'},
-    {mode:'autumn',bg:['#1a2431','#0c121b'],palette:['#ffbe76','#ffa502','#ff7f50','#ff6b6b'],shapes:'leavesLite',text:'Ultimi colori.  Nuova stagione in arrivo.'},
-    {mode:'winter',bg:['#0b1a2c','#091223'],palette:['#eaf6ff','#dff2ff','#cfe9ff','#bfe0ff'],shapes:'flakesSoft',text:'Nevica piano.  Preparati al lancio.'},
-    {mode:'autumn',bg:['#20151a','#0f1016'],palette:['#f94144','#f3722c','#f8961e','#f9844a'],shapes:'berries',text:'Dettagli che scaldano.  Siamo quasi pronti.'},
-    {mode:'winter',bg:['#0a1c28','#08111b'],palette:['#bde0fe','#a2d2ff','#caf0f8','#ade8f4'],shapes:'needles',text:'Aria frizzante.  Nuovo capitolo in vista.'},
-    {mode:'autumn',bg:['#291a14','#111016'],palette:['#ffadad','#ffd6a5','#fdc086','#f4a261'],shapes:'leavesRound',text:'Ritmo che cambia.  Tieniti pronto.'},
-    {mode:'winter',bg:['#0b1324','#070e19'],palette:['#b8e1ff','#9bd1ff','#c9f1ff','#ffffff'],shapes:'stars',text:'Cielo terso.  Magia in arrivo.'},
-    {mode:'autumn',bg:['#201c13','#0f1013'],palette:['#c9a227','#dda15e','#bc6c25','#e76f51'],shapes:'acorns',text:'Calore e attesa.  Il momento si avvicina.'},
-    {mode:'winter',bg:['#0a1526','#07101b'],palette:['#94d2ff','#7ac8ff','#b3e5ff','#e0f2ff'],shapes:'shards',text:'Scintille di ghiaccio.  Ci vediamo presto.'}
+    {mode:'autumn',bg:['#1a2537','#0c1524'],palette:['#ffb703','#fb8500','#e76f51','#ffd166'],shapes:'leaves',text:'THE WINTER BOMA<br>IS COMING'},
+    {mode:'winter',bg:['#0b1930','#0a1022'],palette:['#c2f5ff','#8ad6ff','#bfe8ff','#eaf6ff'],shapes:'flakes',text:'THE WINTER BOMA<br>IS COMING'},
+    {mode:'autumn',bg:['#261c1a','#0f1216'],palette:['#d97706','#f59e0b','#b45309','#92400e'],shapes:'leavesHeavy',text:'THE WINTER BOMA<br>IS COMING'},
+    {mode:'winter',bg:['#0a1724','#0a0f19'],palette:['#bbf0ff','#a5e3ff','#daefff','#9bd1ff'],shapes:'crystals',text:'THE WINTER BOMA<br>IS COMING'},
+    {mode:'autumn',bg:['#1a2431','#0c121b'],palette:['#ffbe76','#ffa502','#ff7f50','#ff6b6b'],shapes:'leavesLite',text:'THE WINTER BOMA<br>IS COMING'},
+    {mode:'winter',bg:['#0b1a2c','#091223'],palette:['#eaf6ff','#dff2ff','#cfe9ff','#bfe0ff'],shapes:'flakesSoft',text:'THE WINTER BOMA<br>IS COMING'},
+    {mode:'autumn',bg:['#20151a','#0f1016'],palette:['#f94144','#f3722c','#f8961e','#f9844a'],shapes:'berries',text:'THE WINTER BOMA<br>IS COMING'},
+    {mode:'winter',bg:['#0a1c28','#08111b'],palette:['#bde0fe','#a2d2ff','#caf0f8','#ade8f4'],shapes:'needles',text:'THE WINTER BOMA<br>IS COMING'},
+    {mode:'autumn',bg:['#291a14','#111016'],palette:['#ffadad','#ffd6a5','#fdc086','#f4a261'],shapes:'leavesRound',text:'THE WINTER BOMA<br>IS COMING'},
+    {mode:'winter',bg:['#0b1324','#070e19'],palette:['#b8e1ff','#9bd1ff','#c9f1ff','#ffffff'],shapes:'stars',text:'THE WINTER BOMA<br>IS COMING'},
+    {mode:'autumn',bg:['#201c13','#0f1013'],palette:['#c9a227','#dda15e','#bc6c25','#e76f51'],shapes:'acorns',text:'THE WINTER BOMA<br>IS COMING'},
+    {mode:'winter',bg:['#0a1526','#07101b'],palette:['#94d2ff','#7ac8ff','#b3e5ff','#e0f2ff'],shapes:'shards',text:'THE WINTER BOMA<br>IS COMING'}
   ]
 
   const LEAF_SHAPES = [
