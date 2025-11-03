@@ -573,6 +573,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const re = /^(?:\+?39\s?)?\d{2,3}\s?\d{6,8}$/;
     return re.test(phone.replace(/\s/g, ''));
   }
+  function validateName(name) {
+    return name.split(' ').filter(word => word.length > 0).length >= 2;
+  }
 
   // ------- submit (webhook + tessera) -------
   function generateMemberId(){ const base = 10000 + (Date.now() % 90000000); return String(base); }
@@ -615,6 +618,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const privacy = document.getElementById('privacy').checked;
     if(!name || !email || !phone || !privacy){
       toast('Compila tutti i campi obbligatori e dai il consenso'); if(btnS) btnS.disabled=false; return;
+    }
+    if(!validateName(name)){
+      toast('Inserisci nome e cognome (almeno due parole).'); if(btnS) btnS.disabled=false; return;
     }
     if(!validateEmail(email)){
       toast('Inserisci un indirizzo email valido.'); if(btnS) btnS.disabled=false; return;
